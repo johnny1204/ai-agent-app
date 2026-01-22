@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>カウントダウンタイマー</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>カウントダウンタイマー</h1>
+        <div class="timer-display" id="display">00:00</div>
+        
+        <div class="input-group">
+            <input type="number" id="minutes" placeholder="分" min="0" max="99">
+            <span>分</span>
+            <input type="number" id="seconds" placeholder="秒" min="0" max="59">
+            <span>秒</span>
+        </div>
+
+        <div class="controls">
+            <button id="startBtn">開始</button>
+            <button id="stopBtn" disabled>停止</button>
+            <button id="resetBtn">リセット</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

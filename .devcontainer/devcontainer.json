@@ -1,0 +1,14 @@
+{
+  "name": "Profit Factory",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:1-20-bullseye",
+  "remoteUser": "root",
+  "customizations": {
+    "vscode": {
+      "settings": {},
+      "extensions": [
+        "dbaeumer.vscode-eslint"
+      ]
+    }
+  },
+  "postCreateCommand": "npm install"
+}
