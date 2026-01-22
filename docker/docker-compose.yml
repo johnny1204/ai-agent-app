@@ -4,4 +4,4 @@ services:
     ports:
       - "8080:80"
     volumes:
-      - ../app/day1:/usr/share/nginx/html
+      - ../app:/usr/share/nginx/html

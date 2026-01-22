@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>肩書はまだない | Portfolio</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Outfit:wght@300;500;700&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'Noto Sans JP', 'sans-serif'],
+                    },
+                    colors: {
+                        slate: {
+                            850: '#152033', // Custom dark shade
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom animations not easily doable with standard Tailwind classes */
+        @keyframes blob {
+            0% {
+                transform: translate(0px, 0px) scale(1);
+            }
+
+            33% {
+                transform: translate(30px, -50px) scale(1.1);
+            }
+
+            66% {
+                transform: translate(-20px, 20px) scale(0.9);
+            }
+
+            100% {
+                transform: translate(0px, 0px) scale(1);
+            }
+        }
+
+        .animate-blob {
+            animation: blob 7s infinite;
+        }
+
+        .animation-delay-2000 {
+            animation-delay: 2s;
+        }
+
+        .animation-delay-4000 {
+            animation-delay: 4s;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-slate-900 text-slate-50 min-h-screen flex flex-col font-sans overflow-x-hidden selection:bg-sky-500 selection:text-white">
+
+    <!-- Background Effects -->
+    <div class="fixed inset-0 bg-slate-900 -z-20"></div>
+    <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 opacity-30 pointer-events-none">
+        <div
+            class="absolute top-0 -left-4 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob">
+        </div>
+        <div
+            class="absolute top-0 -right-4 w-72 h-72 bg-sky-500 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000">
+        </div>
+        <div
+            class="absolute -bottom-8 left-20 w-72 h-72 bg-indigo-500 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000">
+        </div>
+    </div>
+
+    <header class="w-full px-6 py-8 flex justify-between items-center max-w-7xl mx-auto">
+        <div class="text-xl font-bold tracking-wider text-slate-100 uppercase">
+            肩書はまだない
+        </div>
+        <nav>
+            <a href="https://x.com/katagaki_noname" target="_blank" rel="noopener noreferrer"
+                class="group flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800/50 border border-slate-700/50 hover:bg-slate-800 hover:border-sky-500/50 transition-all duration-300 backdrop-blur-sm">
+                <img src="assets/x_icon.png" alt="X Icon"
+                    class="w-6 h-6 rounded-full group-hover:scale-110 transition-transform duration-300">
+                <span
+                    class="text-sm font-medium text-slate-400 group-hover:text-sky-400 transition-colors">@katagaki_noname</span>
+            </a>
+        </nav>
+    </header>
+
+    <main class="flex-grow w-full px-6 py-16 max-w-7xl mx-auto">
+        <section class="text-center mb-24 relative">
+            <div class="inline-block mb-6 relative">
+                <div
+                    class="absolute -inset-1 bg-gradient-to-r from-sky-500 to-indigo-500 rounded-full blur opacity-25 group-hover:opacity-100 transition duration-1000 group-hover:duration-200">
+                </div>
+                <img src="assets/x_icon.png" alt="Profile"
+                    class="relative w-24 h-24 rounded-full border-4 border-slate-900 shadow-xl object-cover">
+            </div>
+
+            <h1 class="text-5xl md:text-7xl font-bold mb-6 tracking-tight">
+                <span class="bg-clip-text text-transparent bg-gradient-to-r from-slate-100 via-sky-200 to-slate-100">
+                    Building the Future,
+                </span>
+                <br>
+                <span class="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-cyan-400">
+                    One Day at a Time.
+                </span>
+            </h1>
+            <p class="text-xl text-slate-400 font-light max-w-2xl mx-auto leading-relaxed">
+                AI Agent Application Development Journey
+            </p>
+        </section>
+
+        <section>
+            <h2 class="text-2xl font-bold mb-10 pl-4 border-l-4 border-sky-500 text-slate-100">
+                Projects
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Day 1 Card -->
+                <a href="day1/index.html" class="group relative block">
+                    <div
+                        class="absolute -inset-0.5 bg-gradient-to-r from-sky-500 to-indigo-500 rounded-2xl blur opacity-0 group-hover:opacity-75 transition duration-500">
+                    </div>
+                    <div
+                        class="relative h-full bg-slate-900 border border-slate-800 rounded-xl p-8 hover:bg-slate-850 transition-all duration-300 flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-start mb-6">
+                                <span
+                                    class="px-3 py-1 text-xs font-bold tracking-widest text-sky-400 uppercase bg-sky-950/30 rounded-full border border-sky-900">
+                                    Day 1
+                                </span>
+                                <svg class="w-6 h-6 text-slate-600 group-hover:text-sky-400 transition-colors transform group-hover:translate-x-1 group-hover:-translate-y-1"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14">
+                                    </path>
+                                </svg>
+                            </div>
+                            <h3
+                                class="text-2xl font-bold text-slate-100 mb-3 group-hover:text-sky-300 transition-colors">
+                                カウントダウンタイマー
+                            </h3>
+                            <p class="text-slate-400 leading-relaxed text-sm">
+                                Vanilla JSで構築された、シンプルなカウントダウンタイマー
+                            </p>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Placeholder for future project -->
+                <!-- 
+                <div class="relative h-full bg-slate-900/50 border border-slate-800/50 rounded-xl p-8 flex flex-col justify-center items-center text-slate-600 border-dashed">
+                    <span class="text-sm font-medium">Coming Soon</span>
+                </div> 
+                -->
+            </div>
+        </section>
+    </main>
+
+    <footer
+        class="w-full py-8 text-center text-slate-600 text-sm border-t border-slate-800/50 mt-12 bg-slate-900/80 backdrop-blur">
+        <p>&copy; 2026 肩書はまだない. All rights reserved.</p>
+    </footer>
+
+</body>
+
+</html>
