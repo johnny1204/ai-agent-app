@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3 Items TODO | Day 2</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Background Animation -->
+    <div class="bg-gradient">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <div class="container">
+        <a href="../index.html" class="back-link">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 12H5" />
+                <path d="M12 19l-7-7 7-7" />
+            </svg>
+            ポートフォリオに戻る
+        </a>
+
+        <header>
+            <h1>3 Items TODO</h1>
+            <p class="subtitle">3つに集中する、シンプルなタスク管理</p>
+        </header>
+
+        <main>
+            <div class="card">
+                <form id="todo-form">
+                    <div class="input-group">
+                        <div>
+                            <label for="title">TODO項目</label>
+                            <input type="text" id="title" placeholder="やるべきことを入力..." autocomplete="off">
+                        </div>
+
+                        <div class="input-row">
+                            <div>
+                                <label for="reg-date">登録日</label>
+                                <input type="date" id="reg-date" readonly>
+                            </div>
+                            <div>
+                                <label for="due-date">期日</label>
+                                <input type="date" id="due-date" required>
+                            </div>
+                        </div>
+
+                        <button type="submit" id="add-btn" class="btn-primary">
+                            追加する
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="list-header"
+                style="display: flex; justify-content: space-between; margin-bottom: 1rem; padding: 0 0.5rem;">
+                <h2 style="font-size: 1.2rem; font-weight: 600;">タスクリスト</h2>
+                <span id="count-display"
+                    style="background: rgba(14, 165, 233, 0.2); color: var(--accent); padding: 0.2rem 0.8rem; border-radius: 1rem; font-size: 0.9rem; font-weight: 700;">0
+                    / 3</span>
+            </div>
+
+            <div id="todo-list" class="todo-list">
+                <!-- Items will be injected here -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast Component -->
+    <div class="toast-container">
+        <div id="toast" class="toast">Notice message</div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
