@@ -25,7 +25,13 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    position: relative;
+    /* Added for badge positioning */
 }
+
+/* ... existing styles ... */
+
+/* Removed absolute day-badge styles */
 
 h1 {
     color: #333;
@@ -117,12 +123,29 @@ button:disabled {
     gap: 0.5rem;
     color: #666;
     text-decoration: none;
-    margin-bottom: 1rem;
     transition: color 0.2s;
     font-size: 0.9rem;
-    align-self: flex-start;
 }
 
 .back-link:hover {
     color: #4CAF50;
+}
+
+.nav-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.day-badge {
+    background-color: #e3f2fd;
+    color: #1976d2;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
