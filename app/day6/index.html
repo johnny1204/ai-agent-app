@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 6: Strong Password Generator</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;700&family=Shippori+Mincho:wght@500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+
+<body>
+    <div class="container">
+        <a href="../index.html" class="home-link"><i class="fas fa-arrow-left"></i> TOPへ戻る</a>
+        <div class="glass-card">
+            <h1>パスワード生成</h1>
+            <p class="subtitle">強力で安全なパスワードを作成します</p>
+
+            <div class="controls-container">
+                <!-- Length -->
+                <div class="control-group">
+                    <label for="length">文字数</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="length" min="4" max="64" value="12">
+                        <span class="input-hint">(4-64)</span>
+                    </div>
+                </div>
+
+                <!-- Quantity -->
+                <div class="control-group">
+                    <label for="quantity">発行件数</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="quantity" min="1" max="10" value="1">
+                        <span class="input-hint">(最大10件)</span>
+                    </div>
+                </div>
+
+                <!-- Options -->
+                <div class="options-grid">
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="uppercase" checked>
+                        <label for="uppercase">大文字 (A-Z)</label>
+                    </div>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="lowercase" checked>
+                        <label for="lowercase">小文字 (a-z)</label>
+                    </div>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="numbers" checked>
+                        <label for="numbers">数字 (0-9)</label>
+                    </div>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="symbols" checked>
+                        <label for="symbols">記号 (!@#...)</label>
+                    </div>
+                </div>
+
+                <button id="generate-btn" class="btn primary-btn">
+                    <i class="fas fa-key"></i> 生成する
+                </button>
+            </div>
+
+            <!-- Results -->
+            <div id="result-area" class="result-area hidden">
+                <h2>生成結果</h2>
+                <ul id="password-list" class="password-list">
+                    <!-- List items will be injected here -->
+                </ul>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>
