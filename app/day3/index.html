@@ -4,72 +4,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mood Color Diary</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <title>Day 3: Mood Color Diary | Portfolio</title>
+    <script src="../common/config.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../common/style.css">
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 
-<body>
-    <div class="app-container">
-        <div class="nav-header">
-            <a href="../index.html" class="back-link">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M19 12H5" />
-                    <path d="M12 19l-7-7 7-7" />
-                </svg>
-                ポートフォリオに戻る
-            </a>
-            <div class="day-badge">Day 3</div>
+<body
+    class="bg-slate-900 text-slate-50 min-h-screen flex flex-col font-sans overflow-x-hidden selection:bg-pink-500 selection:text-white transition-colors duration-700">
+
+    <!-- Background Effects -->
+    <div class="fixed inset-0 bg-slate-900 -z-20"></div>
+    <div id="bg-tint" class="fixed inset-0 -z-15 transition-colors duration-1000 pointer-events-none opacity-30"></div>
+    <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 opacity-30 pointer-events-none">
+        <div id="blob-1"
+            class="absolute top-10 left-10 w-96 h-96 bg-pink-500 rounded-full mix-blend-screen filter blur-3xl opacity-30 animate-blob">
         </div>
-        <header>
-            <h1>今日の色、今日の気分</h1>
-            <p>今の気分を選んで、色を残そう</p>
-        </header>
-
-        <main>
-            <section class="mood-selector">
-                <h2>今の気分は？</h2>
-                <div class="mood-options">
-                    <button class="mood-btn" data-mood="happy" data-color="#FFD93D" aria-label="最高！">
-                        <span class="emoji">😆</span>
-                        <span class="label">最高！</span>
-                    </button>
-                    <button class="mood-btn" data-mood="relaxed" data-color="#98DDCA" aria-label="リラックス">
-                        <span class="emoji">🍵</span>
-                        <span class="label">リラックス</span>
-                    </button>
-                    <button class="mood-btn" data-mood="neutral" data-color="#E6E6E6" aria-label="ふつう">
-                        <span class="emoji">😐</span>
-                        <span class="label">ふつう</span>
-                    </button>
-                    <button class="mood-btn" data-mood="sad" data-color="#A2D2FF" aria-label="ブルー">
-                        <span class="emoji">😢</span>
-                        <span class="label">ブルー</span>
-                    </button>
-                    <button class="mood-btn" data-mood="tired" data-color="#CDB4DB" aria-label="疲れた">
-                        <span class="emoji">😫</span>
-                        <span class="label">疲れた</span>
-                    </button>
-                </div>
-            </section>
-
-            <section class="memo-section">
-                <textarea id="memo-input" placeholder="今日の一言メモ..."></textarea>
-                <button id="save-btn">記録する</button>
-            </section>
-
-            <section class="history-section">
-                <h2>過去の記録</h2>
-                <div id="diary-list" class="diary-list">
-                    <!-- Entries will be populated here -->
-                </div>
-                <button id="clear-btn" class="secondary-btn">履歴をクリア</button>
-            </section>
-        </main>
+        <div id="blob-2"
+            class="absolute bottom-10 right-10 w-96 h-96 bg-violet-500 rounded-full mix-blend-screen filter blur-3xl opacity-30 animate-blob animation-delay-2000">
+        </div>
     </div>
+
+    <!-- Header -->
+    <header class="w-full px-6 py-8 flex justify-between items-center max-w-5xl mx-auto">
+        <a href="../index.html"
+            class="flex items-center gap-2 text-slate-400 hover:text-pink-400 transition-colors duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd"
+                    d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+                    clip-rule="evenodd" />
+            </svg>
+            <span class="text-sm font-medium tracking-wide">ポートフォリオに戻る</span>
+        </a>
+        <div class="text-xl font-bold tracking-wider text-slate-100 uppercase">
+            Day 3
+        </div>
+    </header>
+
+    <main class="flex-grow w-full px-4 py-8 max-w-2xl mx-auto flex flex-col gap-10">
+
+        <div class="w-full text-center">
+            <h1
+                class="text-4xl md:text-5xl font-bold mb-4 tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-pink-300 to-violet-300 font-[M_PLUS_Rounded_1c]">
+                Mood Color Diary
+            </h1>
+            <p class="text-slate-400 font-light">
+                今の気分を選んで、色を残そう
+            </p>
+        </div>
+
+        <!-- Input Section -->
+        <div class="w-full relative group">
+            <div
+                class="absolute -inset-0.5 bg-gradient-to-r from-pink-500 to-violet-500 rounded-3xl blur opacity-30 group-hover:opacity-60 transition duration-500">
+            </div>
+            <div class="relative bg-slate-900/90 backdrop-blur-xl border border-slate-800 rounded-2xl p-8 shadow-2xl">
+
+                <h2
+                    class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-6 border-l-4 border-pink-500 pl-3">
+                    今の気分は？</h2>
+
+                <div class="grid grid-cols-5 gap-2 md:gap-4 mb-8">
+                    <button
+                        class="mood-btn group flex flex-col items-center gap-2 p-3 rounded-xl border border-slate-700 hover:bg-slate-800 transition-all duration-300"
+                        data-mood="happy" data-color="#f472b6" aria-label="最高！">
+                        <span class="text-3xl transform group-hover:scale-110 transition-transform">😆</span>
+                        <span
+                            class="text-[10px] md:text-xs font-bold text-slate-400 group-hover:text-pink-400">最高！</span>
+                    </button>
+                    <button
+                        class="mood-btn group flex flex-col items-center gap-2 p-3 rounded-xl border border-slate-700 hover:bg-slate-800 transition-all duration-300"
+                        data-mood="relaxed" data-color="#2dd4bf" aria-label="リラックス">
+                        <span class="text-3xl transform group-hover:scale-110 transition-transform">🍵</span>
+                        <span
+                            class="text-[10px] md:text-xs font-bold text-slate-400 group-hover:text-teal-400">リラックス</span>
+                    </button>
+                    <button
+                        class="mood-btn group flex flex-col items-center gap-2 p-3 rounded-xl border border-slate-700 hover:bg-slate-800 transition-all duration-300"
+                        data-mood="neutral" data-color="#94a3b8" aria-label="ふつう">
+                        <span class="text-3xl transform group-hover:scale-110 transition-transform">😐</span>
+                        <span
+                            class="text-[10px] md:text-xs font-bold text-slate-400 group-hover:text-slate-200">ふつう</span>
+                    </button>
+                    <button
+                        class="mood-btn group flex flex-col items-center gap-2 p-3 rounded-xl border border-slate-700 hover:bg-slate-800 transition-all duration-300"
+                        data-mood="sad" data-color="#60a5fa" aria-label="ブルー">
+                        <span class="text-3xl transform group-hover:scale-110 transition-transform">😢</span>
+                        <span
+                            class="text-[10px] md:text-xs font-bold text-slate-400 group-hover:text-blue-400">ブルー</span>
+                    </button>
+                    <button
+                        class="mood-btn group flex flex-col items-center gap-2 p-3 rounded-xl border border-slate-700 hover:bg-slate-800 transition-all duration-300"
+                        data-mood="tired" data-color="#c084fc" aria-label="疲れた">
+                        <span class="text-3xl transform group-hover:scale-110 transition-transform">😫</span>
+                        <span
+                            class="text-[10px] md:text-xs font-bold text-slate-400 group-hover:text-purple-400">疲れた</span>
+                    </button>
+                </div>
+
+                <div class="mb-6">
+                    <textarea id="memo-input" placeholder="今日の一言メモ..." rows="3"
+                        class="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-200 placeholder-slate-600 focus:outline-none focus:border-pink-500/50 focus:ring-1 focus:ring-pink-500/50 transition-all resize-none"></textarea>
+                </div>
+
+                <button id="save-btn"
+                    class="w-full py-3 rounded-xl bg-gradient-to-r from-pink-600 to-violet-600 text-white font-bold tracking-wide shadow-lg hover:shadow-pink-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300">
+                    記録する
+                </button>
+            </div>
+        </div>
+
+        <!-- History -->
+        <div class="w-full">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-lg font-bold text-slate-200 border-l-4 border-violet-500 pl-3">過去の記録</h2>
+                <button id="clear-btn" class="text-xs text-slate-500 hover:text-rose-400 transition-colors">
+                    履歴をクリア
+                </button>
+            </div>
+
+            <div id="diary-list" class="space-y-4">
+                <!-- Entries injected here -->
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="w-full py-6 text-center text-slate-600 text-xs border-t border-slate-800/50 mt-auto">
+        <p>Day 3 - Mood Color Diary</p>
+    </footer>
 
     <script src="script.js"></script>
 </body>

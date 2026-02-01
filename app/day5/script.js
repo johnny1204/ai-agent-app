@@ -122,7 +122,6 @@ const fallbackQuotes = [
     { quote: "キンキンに冷えてやがるっ・・・！", author: "カイジ（カイジ）" },
     { quote: "ワシの波動球は百八式まであるぞ", author: "石田銀（テニスの王子様）" },
     { quote: "まだまだだね", author: "越前リョーマ（テニスの王子様）" },
-    { quote: "スケベしようや", author: "うずまきナルト（※誤変形ネタ）" }, // Joke removed in thought, but included standard ones
     { quote: "おもしれー女", author: "ネットミーム（少女漫画全般）" }
 ];
 

@@ -5,29 +5,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Day 4: Real-time Counter | Portfolio</title>
+    <!-- 1. Shared Config (Must load before Tailwind) -->
+    <script src="../common/config.js"></script>
+
+    <!-- 2. Tailwind CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Outfit:wght@300;500;700&display=swap"
-        rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Outfit', 'Noto Sans JP', 'sans-serif'],
-                    },
-                    colors: {
-                        slate: {
-                            850: '#152033',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <link rel="stylesheet" href="style.css">
+
+    <!-- 3. Shared Styles (Google Fonts included) -->
+    <link rel="stylesheet" href="../common/style.css">
+
+    <!-- 4. Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 
 <body
@@ -64,7 +52,7 @@
         <div class="w-full max-w-4xl mb-12 text-center">
             <h1
                 class="text-4xl md:text-5xl font-bold mb-4 tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-orange-300 to-rose-300">
-                Real-time Counter
+                文字数カウンター
             </h1>
             <p class="text-slate-400 font-light">
                 文字数・行数をリアルタイムにカウントします

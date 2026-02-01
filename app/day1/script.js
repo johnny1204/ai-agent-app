@@ -22,8 +22,11 @@ function startTimer() {
         const mins = parseInt(minutesInput.value) || 0;
         const secs = parseInt(secondsInput.value) || 0;
         totalSeconds = mins * 60 + secs;
-        
-        if (totalSeconds <= 0) return;
+
+        if (totalSeconds <= 0) {
+            alert('時間を設定してください');
+            return;
+        }
     }
 
     isRunning = true;

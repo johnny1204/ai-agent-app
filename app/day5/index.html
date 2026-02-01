@@ -4,62 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Day 5: Random Quote Generator | Portfolio</title>
+    <title>Day 5: ランダム格言ジェネレーター | Portfolio</title>
+    <script src="../common/config.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Outfit:wght@300;500;700&family=Shippori+Mincho:wght@500&display=swap"
-        rel="stylesheet">
+    <link rel="stylesheet" href="../common/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Outfit', 'Noto Sans JP', 'sans-serif'],
-                        serif: ['Shippori+Mincho', 'serif'],
-                    },
-                    colors: {
-                        slate: {
-                            850: '#152033',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        @keyframes blob {
-            0% {
-                transform: translate(0px, 0px) scale(1);
-            }
-
-            33% {
-                transform: translate(30px, -50px) scale(1.1);
-            }
-
-            66% {
-                transform: translate(-20px, 20px) scale(0.9);
-            }
-
-            100% {
-                transform: translate(0px, 0px) scale(1);
-            }
-        }
-
-        .animate-blob {
-            animation: blob 7s infinite;
-        }
-
-        .animation-delay-2000 {
-            animation-delay: 2s;
-        }
-
-        .animation-delay-4000 {
-            animation-delay: 4s;
-        }
-    </style>
 </head>
 
 <body
@@ -97,7 +46,7 @@
         <div class="w-full text-center mb-12">
             <h1
                 class="text-4xl md:text-5xl font-bold mb-4 tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-teal-300 to-emerald-300">
-                Random Quote
+                ランダム格言ジェネレーター
             </h1>
             <p class="text-slate-400 font-light">
                 名言・格言ジェネレーター

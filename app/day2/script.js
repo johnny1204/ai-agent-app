@@ -17,11 +17,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const today = new Date().toISOString().split('T')[0];
     regDateInput.value = today;
 
-    // Initialize
-    loadTodos();
-
-    // Event Listeners
+    // Event Listeners first to ensure they bind even if loading fails
     todoForm.addEventListener('submit', handleAddTodo);
+
+    // Initialize
+    try {
+        loadTodos();
+    } catch (e) {
+        console.error('Init error:', e);
+    }
 
     // Functions
     function loadTodos() {
@@ -31,8 +35,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function getTodosFromStorage() {
-        const stored = sessionStorage.getItem('day2_todos');
-        return stored ? JSON.parse(stored) : [];
+        try {
+            const stored = sessionStorage.getItem('day2_todos');
+            return stored ? JSON.parse(stored) : [];
+        } catch (e) {
+            console.error('JSON Parse error:', e);
+            sessionStorage.removeItem('day2_todos'); // Clear bad data
+            return [];
+        }
     }
 
     function saveTodosToStorage(todos) {
@@ -98,9 +108,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (todos.length === 0) {
             todoList.innerHTML = `
-                <div class="empty-state">
-                    <p>TODOはまだありません</p>
-                    <p class="text-xs mt-2">新しいタスクを追加してください</p>
+                <div class="text-center py-10 bg-slate-900/50 border border-slate-800 rounded-2xl border-dashed">
+                    <p class="text-slate-500 mb-2">TODOはまだありません</p>
+                    <p class="text-xs text-slate-600">新しいタスクを追加してください</p>
                 </div>
             `;
             return;
@@ -109,17 +119,21 @@ document.addEventListener('DOMContentLoaded', () => {
         todos.forEach(todo => {
             const isOverdue = checkOverdue(todo.dueDate);
             const item = document.createElement('div');
-            item.className = `todo-item ${isOverdue ? 'overdue' : ''}`;
+            // Tailwind classes for item
+            const overdueClass = isOverdue ? 'border-rose-900/50 bg-rose-950/10' : 'border-slate-800 bg-slate-900/80';
+            const overdueText = isOverdue ? 'text-rose-400' : 'text-slate-400';
+
+            item.className = `group flex items-center justify-between p-5 rounded-2xl border ${overdueClass} backdrop-blur-sm hover:border-sky-500/30 transition-all duration-300`;
 
             item.innerHTML = `
-                <div class="todo-content">
-                    <div class="todo-title">${escapeHtml(todo.title)}</div>
-                    <div class="todo-meta">
-                        <div class="reg-date">登録: <span>${formatDate(todo.regDate)}</span></div>
-                        <div class="due-date">期日: <span>${formatDate(todo.dueDate)}</span> ${isOverdue ? '(期限切れ)' : ''}</div>
+                <div class="flex-grow">
+                    <div class="text-lg font-bold text-slate-200 mb-1">${escapeHtml(todo.title)}</div>
+                    <div class="flex gap-4 text-xs">
+                        <div class="text-slate-500">登録: <span class="font-mono">${formatDate(todo.regDate)}</span></div>
+                        <div class="${overdueText}">期日: <span class="font-mono text-slate-300">${formatDate(todo.dueDate)}</span> ${isOverdue ? '<span class="text-rose-500 font-bold ml-1">(期限切れ)</span>' : ''}</div>
                     </div>
                 </div>
-                <button class="btn-delete" data-id="${todo.id}" aria-label="削除">
+                <button class="btn-delete w-10 h-10 rounded-lg bg-slate-800 text-slate-400 hover:text-rose-400 hover:bg-rose-950/30 hover:border hover:border-rose-900/50 transition-all duration-300 flex items-center justify-center flex-shrink-0 ml-4 group-hover:opacity-100 opacity-100 md:opacity-0" data-id="${todo.id}" aria-label="削除">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
                 </button>
             `;
@@ -135,43 +149,47 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateUIState(count) {
         countDisplay.textContent = `${count} / ${MAX_ITEMS}`;
         addBtn.disabled = count >= MAX_ITEMS;
-
-        if (count >= MAX_ITEMS) {
-            addBtn.textContent = 'リストがいっぱいです';
-        } else {
-            addBtn.textContent = '追加する';
-        }
     }
 
     function checkOverdue(dateString) {
         const today = new Date();
-        today.setHours(0, 0, 0, 0); // Normalize today to start of day
-        const due = new Date(dateString);
-        due.setHours(0, 0, 0, 0); // Normalize due date
-
-        return due < today;
+        today.setHours(0, 0, 0, 0);
+        const date = new Date(dateString);
+        return date < today;
     }
 
     function formatDate(dateString) {
         const date = new Date(dateString);
-        return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`;
+        return date.toLocaleDateString('ja-JP');
     }
 
-    function escapeHtml(unsafe) {
-        return unsafe
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>"']/g, function (match) {
+            const escape = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            };
+            return escape[match];
+        });
     }
 
     function showToast(message, type = 'success') {
         toast.textContent = message;
-        toast.className = `toast show ${type}`;
+
+        // Tailwind styling logic for toast
+        const baseClasses = "fixed bottom-8 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-full shadow-lg border flex items-center gap-3 transition-all duration-300 z-50 font-medium";
+        const typeClasses = type === 'error'
+            ? "bg-rose-950/90 border-rose-800 text-rose-100"
+            : "bg-emerald-950/90 border-emerald-800 text-emerald-100";
+
+        toast.className = `${baseClasses} ${typeClasses} translate-y-0 opacity-100`;
 
         setTimeout(() => {
-            toast.classList.remove('show');
+            toast.className = `${baseClasses} ${typeClasses} translate-y-10 opacity-0 pointer-events-none`;
         }, 3000);
     }
 });
