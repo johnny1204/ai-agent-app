@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     generateBtn.addEventListener('click', () => {
         const length = parseInt(lengthInput.value);
         const quantity = parseInt(quantityInput.value);
-        
+
         // Validation
         if (isNaN(length) || length < 4 || length > 64) {
             alert('文字数は4〜64の間で指定してください。');
@@ -71,18 +71,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const results = [];
         for (let i = 0; i < count; i++) {
             let password = [...guaranteedChars];
-            
+
             // Fill the rest
             while (password.length < length) {
                 password.push(getRandomChar(availableChars));
             }
 
             // Shuffle
-            password =  shuffleArray(password);
-            
+            password = shuffleArray(password);
+
             // Trim if exceeds length (though our logic shouldn't exceed unless guaranteed > length, which is handled by validation ideally, but min length 4 covers it)
             // But if guaranteedChars has 4 and length is 4, we are good.
-            
+
             results.push(password.join(''));
         }
         return results;
@@ -104,14 +104,14 @@ document.addEventListener('DOMContentLoaded', () => {
         passwordList.innerHTML = '';
         passwords.forEach(pwd => {
             const li = document.createElement('li');
-            li.className = 'password-item';
-            
+            li.className = 'flex items-center justify-between p-4 bg-slate-950 border border-slate-800 rounded-lg group hover:border-sky-500/50 transition-colors';
+
             const span = document.createElement('span');
-            span.className = 'password-text';
+            span.className = 'font-mono text-lg text-slate-200 tracking-wider break-all mr-4';
             span.textContent = pwd;
-            
+
             const btn = document.createElement('button');
-            btn.className = 'copy-btn';
+            btn.className = 'w-10 h-10 rounded-lg bg-slate-800 text-slate-400 hover:text-white hover:bg-sky-600 transition-all duration-300 flex-shrink-0 flex items-center justify-center';
             btn.innerHTML = '<i class="far fa-copy"></i>';
             btn.title = 'コピー';
             btn.onclick = () => copyToClipboard(pwd, btn);
@@ -128,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const originalIcon = btnElement.innerHTML;
             btnElement.innerHTML = '<i class="fas fa-check"></i>';
             btnElement.style.color = 'green';
-            
+
             setTimeout(() => {
                 btnElement.innerHTML = originalIcon;
                 btnElement.style.color = '';

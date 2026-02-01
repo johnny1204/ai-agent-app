@@ -4,75 +4,198 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Day 6: Strong Password Generator</title>
-    <link rel="stylesheet" href="style.css">
-    <!-- Google Fonts -->
+    <title>Day 6: Strong Password Generator | Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;700&family=Shippori+Mincho:wght@500&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Outfit:wght@300;500;700&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'Noto Sans JP', 'sans-serif'],
+                    },
+                    colors: {
+                        slate: {
+                            850: '#152033',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @keyframes blob {
+            0% {
+                transform: translate(0px, 0px) scale(1);
+            }
+
+            33% {
+                transform: translate(30px, -50px) scale(1.1);
+            }
+
+            66% {
+                transform: translate(-20px, 20px) scale(0.9);
+            }
+
+            100% {
+                transform: translate(0px, 0px) scale(1);
+            }
+        }
+
+        .animate-blob {
+            animation: blob 7s infinite;
+        }
+
+        .animation-delay-2000 {
+            animation-delay: 2s;
+        }
+
+        /* Checkbox customization */
+        .custom-checkbox:checked {
+            background-color: #0ea5e9;
+            /* Sky-500 */
+            border-color: #0ea5e9;
+        }
+
+        /* Hide number input spinners */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    </style>
 </head>
 
-<body>
-    <div class="container">
-        <a href="../index.html" class="home-link"><i class="fas fa-arrow-left"></i> TOPへ戻る</a>
-        <div class="glass-card">
-            <h1>パスワード生成</h1>
-            <p class="subtitle">強力で安全なパスワードを作成します</p>
+<body
+    class="bg-slate-900 text-slate-50 min-h-screen flex flex-col font-sans overflow-x-hidden selection:bg-sky-500 selection:text-white">
 
-            <div class="controls-container">
-                <!-- Length -->
-                <div class="control-group">
-                    <label for="length">文字数</label>
-                    <div class="input-wrapper">
-                        <input type="number" id="length" min="4" max="64" value="12">
-                        <span class="input-hint">(4-64)</span>
-                    </div>
-                </div>
-
-                <!-- Quantity -->
-                <div class="control-group">
-                    <label for="quantity">発行件数</label>
-                    <div class="input-wrapper">
-                        <input type="number" id="quantity" min="1" max="10" value="1">
-                        <span class="input-hint">(最大10件)</span>
-                    </div>
-                </div>
-
-                <!-- Options -->
-                <div class="options-grid">
-                    <div class="checkbox-wrapper">
-                        <input type="checkbox" id="uppercase" checked>
-                        <label for="uppercase">大文字 (A-Z)</label>
-                    </div>
-                    <div class="checkbox-wrapper">
-                        <input type="checkbox" id="lowercase" checked>
-                        <label for="lowercase">小文字 (a-z)</label>
-                    </div>
-                    <div class="checkbox-wrapper">
-                        <input type="checkbox" id="numbers" checked>
-                        <label for="numbers">数字 (0-9)</label>
-                    </div>
-                    <div class="checkbox-wrapper">
-                        <input type="checkbox" id="symbols" checked>
-                        <label for="symbols">記号 (!@#...)</label>
-                    </div>
-                </div>
-
-                <button id="generate-btn" class="btn primary-btn">
-                    <i class="fas fa-key"></i> 生成する
-                </button>
-            </div>
-
-            <!-- Results -->
-            <div id="result-area" class="result-area hidden">
-                <h2>生成結果</h2>
-                <ul id="password-list" class="password-list">
-                    <!-- List items will be injected here -->
-                </ul>
-            </div>
+    <!-- Background Effects -->
+    <div class="fixed inset-0 bg-slate-900 -z-20"></div>
+    <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 opacity-30 pointer-events-none">
+        <div
+            class="absolute top-10 left-10 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob">
+        </div>
+        <div
+            class="absolute bottom-10 right-10 w-96 h-96 bg-cyan-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000">
         </div>
     </div>
+
+    <!-- Header -->
+    <header class="w-full px-6 py-8 flex justify-between items-center max-w-5xl mx-auto">
+        <a href="../index.html"
+            class="flex items-center gap-2 text-slate-400 hover:text-sky-400 transition-colors duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd"
+                    d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+                    clip-rule="evenodd" />
+            </svg>
+            <span class="text-sm font-medium tracking-wide">ポートフォリオに戻る</span>
+        </a>
+        <div class="text-xl font-bold tracking-wider text-slate-100 uppercase">
+            Day 6
+        </div>
+    </header>
+
+    <main class="flex-grow w-full px-4 py-8 max-w-2xl mx-auto flex flex-col items-center">
+
+        <div class="w-full text-center mb-12">
+            <h1
+                class="text-4xl md:text-5xl font-bold mb-4 tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-300 to-cyan-300">
+                Password Generator
+            </h1>
+            <p class="text-slate-400 font-light">
+                強力で安全なパスワードを作成します
+            </p>
+        </div>
+
+        <!-- Generator Card -->
+        <div class="w-full relative group">
+            <div
+                class="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-3xl blur opacity-30 group-hover:opacity-60 transition duration-500">
+            </div>
+            <div class="relative bg-slate-900/90 backdrop-blur-xl border border-slate-800 rounded-2xl p-8 shadow-2xl">
+
+                <div class="grid gap-6 mb-8">
+                    <!-- Length -->
+                    <div>
+                        <label for="length" class="block text-xs font-medium text-slate-400 mb-2 ml-1">文字数
+                            (4-64)</label>
+                        <div
+                            class="bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 flex items-center shadow-inner">
+                            <input type="number" id="length" min="4" max="64" value="12"
+                                class="bg-transparent border-none text-slate-100 flex-1 outline-none font-bold">
+                        </div>
+                    </div>
+
+                    <!-- Quantity -->
+                    <div>
+                        <label for="quantity" class="block text-xs font-medium text-slate-400 mb-2 ml-1">発行件数
+                            (最大10)</label>
+                        <div
+                            class="bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 flex items-center shadow-inner">
+                            <input type="number" id="quantity" min="1" max="10" value="1"
+                                class="bg-transparent border-none text-slate-100 flex-1 outline-none font-bold">
+                        </div>
+                    </div>
+
+                    <!-- Options -->
+                    <div class="grid grid-cols-2 gap-4 mt-2">
+                        <label
+                            class="flex items-center gap-3 p-3 rounded-lg border border-slate-800 bg-slate-800/50 cursor-pointer hover:bg-slate-800 transition-colors">
+                            <input type="checkbox" id="uppercase" checked
+                                class="w-5 h-5 rounded border-slate-600 custom-checkbox text-sky-500 focus:ring-sky-500 bg-slate-700">
+                            <span class="text-sm font-medium text-slate-300">大文字 (A-Z)</span>
+                        </label>
+                        <label
+                            class="flex items-center gap-3 p-3 rounded-lg border border-slate-800 bg-slate-800/50 cursor-pointer hover:bg-slate-800 transition-colors">
+                            <input type="checkbox" id="lowercase" checked
+                                class="w-5 h-5 rounded border-slate-600 custom-checkbox text-sky-500 focus:ring-sky-500 bg-slate-700">
+                            <span class="text-sm font-medium text-slate-300">小文字 (a-z)</span>
+                        </label>
+                        <label
+                            class="flex items-center gap-3 p-3 rounded-lg border border-slate-800 bg-slate-800/50 cursor-pointer hover:bg-slate-800 transition-colors">
+                            <input type="checkbox" id="numbers" checked
+                                class="w-5 h-5 rounded border-slate-600 custom-checkbox text-sky-500 focus:ring-sky-500 bg-slate-700">
+                            <span class="text-sm font-medium text-slate-300">数字 (0-9)</span>
+                        </label>
+                        <label
+                            class="flex items-center gap-3 p-3 rounded-lg border border-slate-800 bg-slate-800/50 cursor-pointer hover:bg-slate-800 transition-colors">
+                            <input type="checkbox" id="symbols" checked
+                                class="w-5 h-5 rounded border-slate-600 custom-checkbox text-sky-500 focus:ring-sky-500 bg-slate-700">
+                            <span class="text-sm font-medium text-slate-300">記号 (!@#)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <button id="generate-btn"
+                    class="w-full py-4 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold tracking-wide shadow-lg shadow-sky-900/20 hover:shadow-sky-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2">
+                    <i class="fas fa-key"></i> 生成する
+                </button>
+
+                <!-- Results -->
+                <div id="result-area" class="mt-8 hidden animate-fade-in-up">
+                    <h2
+                        class="text-xs font-black text-slate-500 uppercase tracking-widest mb-4 border-b border-slate-800 pb-2">
+                        生成結果</h2>
+                    <ul id="password-list" class="space-y-3">
+                        <!-- List items injected here with Tailwind classes -->
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="w-full py-6 text-center text-slate-600 text-xs border-t border-slate-800/50 mt-auto">
+        <p>Day 6 - Strong Password Generator</p>
+    </footer>
+
     <script src="script.js"></script>
 </body>
 
