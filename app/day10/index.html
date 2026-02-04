@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 10: 確率シミュレーション | Portfolio</title>
+    <script src="../common/config.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../common/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+
+        .flip-card-inner {
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .flip-card-front,
+        .flip-card-back {
+            backface-visibility: hidden;
+        }
+
+        .flip-card-back {
+            transform: rotateY(180deg);
+        }
+
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+    </style>
+</head>
+
+<body
+    class="bg-slate-900 text-slate-50 min-h-screen flex flex-col font-sans overflow-x-hidden selection:bg-orange-500 selection:text-white">
+
+    <!-- Background Effects -->
+    <div class="fixed inset-0 bg-slate-900 -z-20"></div>
+    <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 opacity-30 pointer-events-none">
+        <div
+            class="absolute top-1/4 left-1/4 w-96 h-96 bg-orange-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob">
+        </div>
+        <div
+            class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-red-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000">
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="w-full px-6 py-8 flex justify-between items-center max-w-5xl mx-auto">
+        <a href="../index.html"
+            class="flex items-center gap-2 text-slate-400 hover:text-orange-400 transition-colors duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd"
+                    d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+                    clip-rule="evenodd" />
+            </svg>
+            <span class="text-sm font-medium tracking-wide">ポートフォリオに戻る</span>
+        </a>
+        <div class="text-xl font-bold tracking-wider text-slate-100 uppercase">
+            Day 10
+        </div>
+    </header>
+
+    <main class="flex-grow w-full px-4 py-8 max-w-4xl mx-auto flex flex-col items-center">
+
+        <div class="w-full text-center mb-10">
+            <h1
+                class="text-4xl md:text-5xl font-bold mb-4 tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-orange-300 to-red-300">
+                確率シミュレーション
+            </h1>
+            <p class="text-slate-400 font-light">
+                コイン投げとサイコロ投げの確率収束を実験
+            </p>
+        </div>
+
+        <div class="w-full grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
+
+            <!-- Controls Panel -->
+            <div class="md:col-span-1 flex flex-col gap-6">
+                <!-- Mode Logic -->
+                <div class="bg-slate-900/90 backdrop-blur-xl border border-slate-800 rounded-2xl p-6 shadow-xl">
+                    <h3 class="text-sm font-bold text-slate-400 mb-4 uppercase tracking-wider">モード選択</h3>
+                    <div class="flex gap-2 bg-slate-950 p-1.5 rounded-xl border border-slate-800">
+                        <button id="mode-coin"
+                            class="flex-1 py-2 rounded-lg text-sm font-bold transition-all duration-300 bg-slate-800 text-orange-400 shadow-md">
+                            <i class="fas fa-coins mr-2"></i>コイン
+                        </button>
+                        <button id="mode-dice"
+                            class="flex-1 py-2 rounded-lg text-sm font-bold transition-all duration-300 text-slate-500 hover:text-slate-300">
+                            <i class="fas fa-dice mr-2"></i>サイコロ
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Simulation Settings -->
+                <div class="bg-slate-900/90 backdrop-blur-xl border border-slate-800 rounded-2xl p-6 shadow-xl">
+                    <h3 class="text-sm font-bold text-slate-400 mb-4 uppercase tracking-wider">設定</h3>
+
+                    <div class="mb-6">
+                        <label class="block text-xs font-medium text-slate-500 mb-2">試行回数</label>
+                        <div class="flex items-center gap-2">
+                            <input type="number" id="trials-input" value="100" min="1" max="100000"
+                                class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 focus:border-orange-500 focus:outline-none transition-colors">
+                        </div>
+                        <div class="flex justify-between mt-2 gap-2">
+                            <button
+                                class="quick-set-btn text-xs bg-slate-800 hover:bg-slate-700 text-slate-400 px-2 py-1 rounded"
+                                data-val="10">10</button>
+                            <button
+                                class="quick-set-btn text-xs bg-slate-800 hover:bg-slate-700 text-slate-400 px-2 py-1 rounded"
+                                data-val="100">100</button>
+                            <button
+                                class="quick-set-btn text-xs bg-slate-800 hover:bg-slate-700 text-slate-400 px-2 py-1 rounded"
+                                data-val="1000">1k</button>
+                            <button
+                                class="quick-set-btn text-xs bg-slate-800 hover:bg-slate-700 text-slate-400 px-2 py-1 rounded"
+                                data-val="10000">10k</button>
+                        </div>
+                    </div>
+
+                    <button id="run-btn"
+                        class="w-full py-3 rounded-xl bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold shadow-lg shadow-orange-500/20 hover:shadow-orange-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300">
+                        実行する
+                    </button>
+                </div>
+            </div>
+
+            <!-- Visuals & Results Panel -->
+            <div class="md:col-span-2 flex flex-col gap-6">
+
+                <!-- Animation Stage -->
+                <div
+                    class="bg-slate-900/50 backdrop-blur-sm border border-slate-800/50 rounded-2xl p-8 flex justify-center items-center min-h-[200px] relative overflow-hidden">
+
+                    <!-- Coin Visual -->
+                    <div id="coin-stage" class="perspective-1000 w-32 h-32 relative hidden">
+                        <div id="coin-inner" class="flip-card-inner w-full h-full relative text-center">
+                            <div
+                                class="flip-card-front absolute w-full h-full bg-yellow-500 rounded-full flex items-center justify-center border-4 border-yellow-300 shadow-xl overflow-hidden backface-hidden">
+                                <span class="text-4xl font-bold text-yellow-900 opacity-50">HEAD</span>
+                            </div>
+                            <div
+                                class="flip-card-back absolute w-full h-full bg-slate-300 rounded-full flex items-center justify-center border-4 border-slate-100 shadow-xl overflow-hidden transform rotate-y-180">
+                                <span class="text-4xl font-bold text-slate-600 opacity-50">TAIL</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dice Visual -->
+                    <div id="dice-stage" class="w-24 h-24 hidden">
+                        <div id="dice-cube"
+                            class="w-full h-full bg-white rounded-2xl flex items-center justify-center shadow-2xl border-2 border-slate-200 text-slate-800 text-5xl">
+                            <i class="fas fa-dice-one"></i>
+                        </div>
+                    </div>
+
+                    <div id="placeholder-msg" class="text-slate-500 text-sm">
+                        設定を選択して「実行」を押してください
+                    </div>
+                </div>
+
+                <!-- Stats Results -->
+                <div id="results-container"
+                    class="hidden bg-slate-900/90 backdrop-blur-xl border border-slate-800 rounded-2xl p-6 shadow-xl">
+                    <h3 class="text-sm font-bold text-slate-400 mb-6 flex justify-between items-end">
+                        <span class="uppercase tracking-wider">実行結果</span>
+                        <span class="text-xs font-normal text-slate-500">Total: <span id="total-count"
+                                class="text-slate-200 font-mono">0</span></span>
+                    </h3>
+
+                    <!-- Coin Stats -->
+                    <div id="coin-stats" class="hidden space-y-4">
+                        <!-- Injected by JS -->
+                    </div>
+
+                    <!-- Dice Stats -->
+                    <div id="dice-stats" class="grid grid-cols-2 sm:grid-cols-3 gap-4 hidden">
+                        <!-- Injected by JS -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="w-full py-6 text-center text-slate-600 text-xs border-t border-slate-800/50 mt-auto">
+        <p>Day 10 - Simulation</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
