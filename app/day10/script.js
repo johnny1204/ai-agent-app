@@ -194,29 +194,64 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Visual Animations (Just for flourish) ---
 
+    // --- Visual Animations ---
+
     function animateCoin() {
         return new Promise(resolve => {
             const coin = document.getElementById('coin-inner');
-            coin.style.transform = 'rotateY(0deg)'; // reset
+            // Remove previous transforms if any
+            coin.style.transform = '';
 
-            // Spin rapidly
+            // Add looping toss animation
+            coin.classList.add('animate-toss');
+
+            // Wait 2 seconds
             setTimeout(() => {
-                coin.style.transform = 'rotateY(1440deg)'; // 4 spins
-            }, 10);
-
-            setTimeout(resolve, 600);
+                coin.classList.remove('animate-toss');
+                // Ensure it lands on something visible (reset)
+                coin.style.transform = 'rotateY(0deg)';
+                resolve();
+            }, 2000);
         });
     }
 
     function animateDice() {
         return new Promise(resolve => {
             const dice = document.getElementById('dice-cube');
-            // Shake
-            dice.classList.add('animate-spin');
+
+            // Add looping 3D roll animation
+            dice.classList.add('animate-roll-3d');
+
+            // Wait 2 seconds
             setTimeout(() => {
-                dice.classList.remove('animate-spin');
+                dice.classList.remove('animate-roll-3d');
+
+                // Randomly decide final landing face (1-6)
+                const finalFace = Math.floor(Math.random() * 6) + 1;
+                let transform = '';
+
+                // Map face to rotation to bring it to front
+                // Based on CSS:
+                // 1 (Front): Y 0
+                // 6 (Back): Y 180
+                // 3 (Right): Y 90  -> Cube Y -90
+                // 4 (Left): Y -90  -> Cube Y 90
+                // 5 (Top): X 90    -> Cube X -90
+                // 2 (Bottom): X -90-> Cube X 90
+
+                switch (finalFace) {
+                    case 1: transform = 'rotateX(0deg) rotateY(0deg)'; break;
+                    case 2: transform = 'rotateX(90deg) rotateY(0deg)'; break;
+                    case 3: transform = 'rotateX(0deg) rotateY(-90deg)'; break;
+                    case 4: transform = 'rotateX(0deg) rotateY(90deg)'; break;
+                    case 5: transform = 'rotateX(-90deg) rotateY(0deg)'; break;
+                    case 6: transform = 'rotateX(0deg) rotateY(180deg)'; break;
+                }
+
+                // Apply transform keeping the translateZ
+                dice.style.transform = `translateZ(-50px) ${transform}`;
                 resolve();
-            }, 500);
+            }, 2000);
         });
     }
 

@@ -31,6 +31,99 @@
         .rotate-y-180 {
             transform: rotateY(180deg);
         }
+
+        /* Coin Toss Animation */
+        @keyframes toss {
+            0% {
+                transform: translateY(0) rotateX(0deg) scale(1);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            }
+
+            50% {
+                transform: translateY(-80px) rotateX(3000deg) scale(1.2);
+                box-shadow: 0 25px 30px rgba(0, 0, 0, 0.1);
+            }
+
+            100% {
+                transform: translateY(0) rotateX(7200deg) scale(1);
+                /* High rotation count for blur effect */
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            }
+        }
+
+        .animate-toss {
+            animation: toss 1s infinite ease-in-out;
+        }
+
+        /* Dice Roll Animation (True 3D) */
+        .scene {
+            perspective: 600px;
+            width: 100px;
+            height: 100px;
+        }
+
+        .cube {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transform: translateZ(-50px);
+        }
+
+        .cube-face {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border: 2px solid #cbd5e1;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: #334155;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            backface-visibility: hidden;
+            /* Optional, but keeps it clean */
+        }
+
+        .face-front {
+            transform: rotateY(0deg) translateZ(50px);
+        }
+
+        .face-back {
+            transform: rotateY(180deg) translateZ(50px);
+        }
+
+        .face-right {
+            transform: rotateY(90deg) translateZ(50px);
+        }
+
+        .face-left {
+            transform: rotateY(-90deg) translateZ(50px);
+        }
+
+        .face-top {
+            transform: rotateX(90deg) translateZ(50px);
+        }
+
+        .face-bottom {
+            transform: rotateX(-90deg) translateZ(50px);
+        }
+
+        @keyframes roll3d {
+            0% {
+                transform: translateZ(-50px) rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+            }
+
+            100% {
+                transform: translateZ(-50px) rotateX(720deg) rotateY(1080deg) rotateZ(360deg);
+            }
+        }
+
+        .animate-roll-3d {
+            animation: roll3d 0.6s linear infinite;
+        }
     </style>
 </head>
 
@@ -133,10 +226,10 @@
 
                 <!-- Animation Stage -->
                 <div
-                    class="bg-slate-900/50 backdrop-blur-sm border border-slate-800/50 rounded-2xl p-8 flex justify-center items-center min-h-[200px] relative overflow-hidden">
+                    class="bg-slate-900/50 backdrop-blur-sm border border-slate-800/50 rounded-2xl p-8 flex justify-center items-center min-h-[250px] relative overflow-hidden perspective-1000">
 
                     <!-- Coin Visual -->
-                    <div id="coin-stage" class="perspective-1000 w-32 h-32 relative hidden">
+                    <div id="coin-stage" class="w-32 h-32 relative hidden preserve-3d">
                         <div id="coin-inner" class="flip-card-inner w-full h-full relative text-center">
                             <div
                                 class="flip-card-front absolute w-full h-full bg-yellow-500 rounded-full flex items-center justify-center border-4 border-yellow-300 shadow-xl overflow-hidden backface-hidden">
@@ -149,15 +242,19 @@
                         </div>
                     </div>
 
-                    <!-- Dice Visual -->
-                    <div id="dice-stage" class="w-24 h-24 hidden">
-                        <div id="dice-cube"
-                            class="w-full h-full bg-white rounded-2xl flex items-center justify-center shadow-2xl border-2 border-slate-200 text-slate-800 text-5xl">
-                            <i class="fas fa-dice-one"></i>
+                    <!-- Dice Visual (True 3D) -->
+                    <div id="dice-stage" class="scene hidden">
+                        <div id="dice-cube" class="cube">
+                            <div class="cube-face face-front"><i class="fas fa-dice-one"></i></div>
+                            <div class="cube-face face-back"><i class="fas fa-dice-six"></i></div>
+                            <div class="cube-face face-right"><i class="fas fa-dice-three"></i></div>
+                            <div class="cube-face face-left"><i class="fas fa-dice-four"></i></div>
+                            <div class="cube-face face-top"><i class="fas fa-dice-five"></i></div>
+                            <div class="cube-face face-bottom"><i class="fas fa-dice-two"></i></div>
                         </div>
                     </div>
 
-                    <div id="placeholder-msg" class="text-slate-500 text-sm">
+                    <div id="placeholder-msg" class="text-slate-500 text-sm absolute bottom-4">
                         設定を選択して「実行」を押してください
                     </div>
                 </div>
