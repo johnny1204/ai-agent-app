@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ポモドーロタイマー | Day 12</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Outfit:wght@300;500;700&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'Noto Sans JP', 'sans-serif'],
+                        mono: ['Outfit', 'monospace'], // Use Outfit for numbers too for cleaner look
+                    },
+                    colors: {
+                        slate: {
+                            850: '#152033',
+                        },
+                        pomodoro: {
+                            red: '#FF6B6B',
+                            green: '#4ECDC4',
+                        }
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .timer-display {
+            font-feature-settings: "tnum";
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Circular Progress Styling */
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.35s;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+
+        .mode-transition {
+            transition: all 0.5s ease-in-out;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-slate-900 text-slate-50 min-h-screen flex flex-col font-sans selection:bg-pomodoro-red selection:text-white transition-colors duration-1000"
+    id="body-bg">
+
+    <!-- Header -->
+    <header class="w-full px-6 py-6 flex justify-between items-center max-w-3xl mx-auto z-10 relative">
+        <a href="../index.html" class="flex items-center gap-2 group">
+            <div
+                class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center border border-slate-700 group-hover:border-white/20 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                    class="w-4 h-4 text-slate-400 group-hover:text-slate-200 transition-colors" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+            </div>
+            <span class="text-sm font-medium text-slate-400 group-hover:text-slate-200 transition-colors">Back</span>
+        </a>
+        <h1 class="text-xl font-bold tracking-wider text-slate-100">ポモドーロタイマー</h1>
+        <div class="w-20"></div> <!-- Spacer -->
+    </header>
+
+    <main class="flex-grow w-full px-4 flex flex-col items-center justify-center max-w-lg mx-auto relative z-0">
+
+        <!-- Background Blobs -->
+        <div
+            class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full max-w-lg -z-10 pointer-events-none">
+            <div id="bg-blob"
+                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-pomodoro-red/20 rounded-full blur-3xl transition-all duration-1000">
+            </div>
+        </div>
+
+        <!-- Timer Card -->
+        <div class="glass w-full rounded-3xl p-8 shadow-2xl relative overflow-hidden">
+
+            <!-- Tabs -->
+            <div class="flex p-1 bg-slate-800/50 rounded-xl mb-10 relative">
+                <div id="tab-highlight"
+                    class="absolute top-1 bottom-1 w-[calc(50%-4px)] bg-slate-700/80 rounded-lg transition-all duration-300 left-1 shadow-sm">
+                </div>
+                <button id="btn-work"
+                    class="flex-1 py-2 text-sm font-bold z-10 transition-colors duration-300 text-white"
+                    onclick="switchMode('work')">
+                    作業 (25分)
+                </button>
+                <button id="btn-break"
+                    class="flex-1 py-2 text-sm font-bold z-10 transition-colors duration-300 text-slate-400"
+                    onclick="switchMode('break')">
+                    休憩 (5分)
+                </button>
+            </div>
+
+            <!-- Timer Display with Circular Progress -->
+            <div class="relative w-64 h-64 mx-auto mb-10">
+                <!-- SVG Circle -->
+                <svg class="w-full h-full" viewBox="0 0 100 100">
+                    <circle class="text-slate-700/50" stroke-width="4" stroke="currentColor" fill="transparent" r="45"
+                        cx="50" cy="50" />
+                    <circle id="progress-ring"
+                        class="progress-ring__circle text-pomodoro-red transition-all duration-500" stroke-width="4"
+                        stroke-linecap="round" stroke="currentColor" fill="transparent" r="45" cx="50" cy="50"
+                        style="stroke-dasharray: 282.743; stroke-dashoffset: 0;" />
+                </svg>
+
+                <!-- Time Text -->
+                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
+                    <div id="timer-display" class="timer-display text-6xl font-bold tracking-tight text-white mb-1">
+                        25:00
+                    </div>
+                    <div id="timer-status" class="text-xs uppercase tracking-[0.2em] text-slate-400 font-medium">
+                        READY
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="flex justify-center items-center gap-6">
+                <!-- Reset Button -->
+                <button id="btn-reset"
+                    class="w-12 h-12 rounded-full flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700/50 transition-all"
+                    aria-label="Reset Timer">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                </button>
+
+                <!-- Start/Pause Button -->
+                <button id="btn-toggle"
+                    class="w-20 h-20 rounded-full bg-slate-100 text-slate-900 hover:scale-105 active:scale-95 transition-all shadow-[0_0_20px_rgba(255,255,255,0.3)] flex items-center justify-center">
+                    <!-- Play Icon -->
+                    <svg id="icon-play" xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 ml-1" fill="currentColor"
+                        viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z" />
+                    </svg>
+                    <!-- Pause Icon (Hidden by default) -->
+                    <svg id="icon-pause" xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 hidden" fill="currentColor"
+                        viewBox="0 0 24 24">
+                        <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+                    </svg>
+                </button>
+
+                <!-- Skip/Next Button (Optional: to switch modes quickly) -->
+                <button id="btn-skip"
+                    class="w-12 h-12 rounded-full flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700/50 transition-all"
+                    aria-label="Skip to next session">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                    </svg>
+                </button>
+            </div>
+
+        </div>
+
+        <div class="mt-8 text-center">
+            <p class="text-slate-500 text-sm">
+                集中して作業を行い、定期的に休憩を取りましょう。
+            </p>
+        </div>
+
+    </main>
+
+    <!-- Audio Elements -->
+    <audio id="sound-complete" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"
+        preload="auto"></audio>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
