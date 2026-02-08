@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>テキストケース変換 | Day 13</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Outfit:wght@300;500;700&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'Noto Sans JP', 'sans-serif'],
+                        mono: ['Outfit', 'monospace'],
+                    },
+                    colors: {
+                        slate: {
+                            850: '#152033',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-glass {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .btn-glass:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .btn-glass:active {
+            transform: translateY(0);
+        }
+
+        /* Custom Scrollbar for Textarea */
+        textarea::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        textarea::-webkit-scrollbar-track {
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 4px;
+        }
+
+        textarea::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.5);
+            border-radius: 4px;
+        }
+
+        textarea::-webkit-scrollbar-thumb:hover {
+            background: rgba(99, 102, 241, 0.7);
+        }
+    </style>
+</head>
+
+<body
+    class="bg-slate-900 text-slate-50 min-h-screen flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
+
+    <!-- Header -->
+    <header class="w-full px-6 py-6 flex justify-between items-center max-w-5xl mx-auto z-10 relative">
+        <a href="../index.html" class="flex items-center gap-2 group">
+            <div
+                class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center border border-slate-700 group-hover:border-indigo-500/50 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                    class="w-4 h-4 text-slate-400 group-hover:text-indigo-400 transition-colors" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+            </div>
+            <span class="text-sm font-medium text-slate-400 group-hover:text-slate-200 transition-colors">Back</span>
+        </a>
+        <h1 class="text-xl font-bold tracking-wider text-slate-100">テキストケース変換</h1>
+        <div class="w-20"></div> <!-- Spacer -->
+    </header>
+
+    <main class="flex-grow w-full px-4 py-8 max-w-5xl mx-auto flex flex-col gap-6 relative z-0">
+
+        <!-- Background Decor -->
+        <div class="fixed top-20 right-0 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl -z-10 pointer-events-none">
+        </div>
+        <div class="fixed bottom-0 left-0 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl -z-10 pointer-events-none">
+        </div>
+
+        <!-- Toolbar -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+            <button onclick="transformText('uppercase')"
+                class="btn-glass px-4 py-3 rounded-xl text-sm font-medium text-slate-200 tracking-wide hover:text-indigo-400 hover:shadow-lg hover:shadow-indigo-500/20">
+                UPPERCASE
+            </button>
+            <button onclick="transformText('lowercase')"
+                class="btn-glass px-4 py-3 rounded-xl text-sm font-medium text-slate-200 tracking-wide hover:text-indigo-400 hover:shadow-lg hover:shadow-indigo-500/20">
+                lowercase
+            </button>
+            <button onclick="transformText('capitalize')"
+                class="btn-glass px-4 py-3 rounded-xl text-sm font-medium text-slate-200 tracking-wide hover:text-indigo-400 hover:shadow-lg hover:shadow-indigo-500/20">
+                Capitalize
+            </button>
+            <button onclick="transformText('sentence')"
+                class="btn-glass px-4 py-3 rounded-xl text-sm font-medium text-slate-200 tracking-wide hover:text-indigo-400 hover:shadow-lg hover:shadow-indigo-500/20">
+                Sentence case
+            </button>
+            <button onclick="transformText('alternating')"
+                class="btn-glass px-4 py-3 rounded-xl text-sm font-medium text-slate-200 tracking-wide hover:text-indigo-400 hover:shadow-lg hover:shadow-indigo-500/20">
+                aLtErNaTiNg
+            </button>
+            <button onclick="transformText('inverse')"
+                class="btn-glass px-4 py-3 rounded-xl text-sm font-medium text-slate-200 tracking-wide hover:text-indigo-400 hover:shadow-lg hover:shadow-indigo-500/20">
+                iNVERSE cASE
+            </button>
+        </div>
+
+        <!-- Text Area Container -->
+        <div class="glass rounded-2xl p-1 relative group flex-grow flex flex-col min-h-[400px]">
+            <div
+                class="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl opacity-0 group-hover:opacity-10 transition-opacity pointer-events-none">
+            </div>
+
+            <textarea id="inputText"
+                class="w-full h-full bg-transparent text-slate-100 p-6 sm:p-8 text-lg leading-relaxed focus:outline-none resize-none placeholder-slate-600 font-sans flex-grow min-h-[300px]"
+                placeholder="ここにテキストを入力または貼り付けてください..."></textarea>
+
+            <!-- Bottom Bar -->
+            <div
+                class="flex flex-col sm:flex-row justify-between items-center p-4 border-t border-slate-700/30 gap-4 bg-slate-800/20 rounded-b-xl">
+                <!-- Counts -->
+                <div class="flex items-center gap-6 text-xs font-medium text-slate-400">
+                    <span class="flex items-center gap-2">
+                        <span id="charCount" class="text-indigo-400 text-lg font-bold">0</span> Characters
+                    </span>
+                    <span class="flex items-center gap-2">
+                        <span id="wordCount" class="text-indigo-400 text-lg font-bold">0</span> Words
+                    </span>
+                    <span class="flex items-center gap-2">
+                        <span id="lineCount" class="text-indigo-400 text-lg font-bold">0</span> Lines
+                    </span>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex items-center gap-3 w-full sm:w-auto">
+                    <button onclick="clearText()"
+                        class="flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors flex items-center justify-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        Clear
+                    </button>
+                    <button onclick="copyText()"
+                        class="flex-1 sm:flex-none px-6 py-2 rounded-lg text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-2 active:scale-95 group/copy">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="w-4 h-4 group-active/copy:scale-75 transition-transform" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                        </svg>
+                        <span id="copyBtnText">Copy Result</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Success Toast -->
+    <div id="toast"
+        class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-slate-800 text-indigo-400 px-6 py-3 rounded-full shadow-2xl border border-indigo-500/20 transform translate-y-20 opacity-0 transition-all duration-300 flex items-center gap-3 z-50 pointer-events-none">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                clip-rule="evenodd" />
+        </svg>
+        <span class="font-medium">Copied to clipboard!</span>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
