@@ -1,11 +1,10 @@
 {
     "name": "ai-agent-app",
     "compatibility_date": "2026-01-22",
-    "main": "src/worker.ts",
-    "assets": {
-        "directory": "./app",
-        "binding": "ASSETS"
-    },
+    "pages_build_output_dir": "./app",
+    "pages_build_output_dir_exclude": [
+        "functions/*"
+    ],
     "d1_databases": [
         {
             "binding": "DB",

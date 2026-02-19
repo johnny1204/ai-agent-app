@@ -2,7 +2,11 @@
     "name": "ai-agent-app",
     "private": true,
     "scripts": {
-        "build": "cd bookshelf && npm install && npm run build",
+        "build": "cd bookshelf && npm install && npm run build && npm run build:worker",
+        "build:worker": "esbuild src/worker.ts --bundle --outfile=app/_worker.js --format=esm --platform=browser --external:cloudflare:workers",
         "build:bookshelf": "cd bookshelf && npm install && npm run build"
+    },
+    "devDependencies": {
+        "esbuild": "^0.27.3"
     }
 }
