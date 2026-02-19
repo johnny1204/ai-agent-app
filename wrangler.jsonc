@@ -3,5 +3,12 @@
     "compatibility_date": "2026-01-22",
     "assets": {
         "directory": "./app"
-    }
+    },
+    "d1_databases": [
+        {
+            "binding": "DB",
+            "database_name": "reading-bookshelf",
+            "database_id": "225db611-6c2e-48a3-bc30-bb64cc75604e"
+        }
+    ]
 }

@@ -1,0 +1,12 @@
+# Build output
+app/bookshelf/
+
+# Wrangler
+.wrangler/
+
+# Dependencies
+node_modules/
+
+# Next.js
+bookshelf/.next/
+bookshelf/out/
