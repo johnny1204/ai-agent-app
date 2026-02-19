@@ -11,29 +11,40 @@ interface Env {
 export default {
     async fetch(request: Request, env: Env): Promise<Response> {
         const url = new URL(request.url);
-        const path = url.pathname;
+        let apiPath = url.pathname;
+
+        // Remove /bookshelf prefix for API routing check ONLY
+        if (apiPath.startsWith('/bookshelf/')) {
+            apiPath = apiPath.replace('/bookshelf', '');
+        } else if (apiPath === '/bookshelf') {
+            apiPath = '/';
+        }
 
         // --- Basic Auth middleware ---
+        // Basic Auth should verify the ORIGINAL path to protect /bookshelf/admin correctly
         if (requiresAuth(request)) {
             const authResponse = checkAuth(request, env);
             if (authResponse) return authResponse;
         }
 
         // --- API routing ---
-        if (path === '/api/books' || path === '/api/books/') {
+        // Use normalized apiPath for internal routing checks
+        if (apiPath === '/api/books' || apiPath === '/api/books/') {
             return handleBooks(request, env.DB);
         }
 
-        const bookIdMatch = path.match(/^\/api\/books\/(\d+)$/);
+        const bookIdMatch = apiPath.match(/^\/api\/books\/(\d+)$/);
         if (bookIdMatch) {
             return handleBookById(request, env.DB, Number(bookIdMatch[1]));
         }
 
-        if (path === '/api/memos' || path === '/api/memos/') {
+        if (apiPath === '/api/memos' || apiPath === '/api/memos/') {
             return handleMemos(request, env.DB);
         }
 
         // --- Static assets ---
+        // Pass the ORIGINAL request to assets (do not modify URL)
+        // Cloudflare Pages expects /bookshelf/... to map to app/bookshelf/...
         return env.ASSETS.fetch(request);
     },
 } satisfies ExportedHandler<Env>;
