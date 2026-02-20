@@ -19,7 +19,7 @@ export default function HomePage() {
       if (selectedStatus) params.set('status', selectedStatus);
       if (selectedTag) params.set('tag', selectedTag);
 
-      const res = await fetch(`/api/books?${params.toString()}`);
+      const res = await fetch(`/bookshelf/api/books?${params.toString()}`);
       if (!res.ok) {
         console.warn('API not available:', res.status);
         return;

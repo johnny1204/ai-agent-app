@@ -15,7 +15,7 @@ function requiresAuth(request: Request): boolean {
     }
 
     // API の書き込み操作は認証必要
-    if (path.startsWith('/api/') && ['POST', 'PUT', 'DELETE'].includes(request.method)) {
+    if (path.startsWith('/bookshelf/api/') && ['POST', 'PUT', 'DELETE'].includes(request.method)) {
         return true;
     }
 

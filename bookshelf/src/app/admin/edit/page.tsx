@@ -27,7 +27,7 @@ function EditContent() {
         if (!id) return;
         async function fetchBook() {
             try {
-                const res = await fetch(`/api/books/${id}?all=1`);
+                const res = await fetch(`/bookshelf/api/books/${id}?all=1`);
                 if (!res.ok) { setLoading(false); return; }
                 const data: BookDetail = await res.json();
                 setBook(data);
@@ -47,7 +47,7 @@ function EditContent() {
         if (!id) return;
         setSaving(true);
         try {
-            const res = await fetch(`/api/books/${id}`, {
+            const res = await fetch(`/bookshelf/api/books/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -64,7 +64,7 @@ function EditContent() {
     const handleAddMemo = async () => {
         if (!id || !memoContent.trim()) return;
         try {
-            const res = await fetch('/api/memos', {
+            const res = await fetch('/bookshelf/api/memos', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -75,7 +75,7 @@ function EditContent() {
             if (res.ok) {
                 setMemoContent('');
                 // リロード
-                const bookRes = await fetch(`/api/books/${id}?all=1`);
+                const bookRes = await fetch(`/bookshelf/api/books/${id}?all=1`);
                 if (bookRes.ok) setBook(await bookRes.json());
             }
         } catch { alert('メモの追加に失敗しました'); }
@@ -84,8 +84,8 @@ function EditContent() {
     const handleDeleteMemo = async (memoId: number) => {
         if (!confirm('このメモを削除しますか？')) return;
         try {
-            await fetch(`/api/memos?id=${memoId}`, { method: 'DELETE' });
-            const bookRes = await fetch(`/api/books/${id}?all=1`);
+            await fetch(`/bookshelf/api/memos?id=${memoId}`, { method: 'DELETE' });
+            const bookRes = await fetch(`/bookshelf/api/books/${id}?all=1`);
             if (bookRes.ok) setBook(await bookRes.json());
         } catch { alert('削除に失敗しました'); }
     };

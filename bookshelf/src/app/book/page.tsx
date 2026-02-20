@@ -24,7 +24,7 @@ function BookContent() {
 
         async function fetchBook() {
             try {
-                const res = await fetch(`/api/books/${id}`);
+                const res = await fetch(`/bookshelf/api/books/${id}`);
                 if (!res.ok) {
                     setError('書籍が見つかりません');
                     return;

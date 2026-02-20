@@ -13,7 +13,7 @@ export default function AdminPage() {
     const fetchBooks = async () => {
         setLoading(true);
         try {
-            const res = await fetch('/api/books?all=1');
+            const res = await fetch('/bookshelf/api/books?all=1');
             if (!res.ok) {
                 console.warn('API not available:', res.status);
                 return;
@@ -32,7 +32,7 @@ export default function AdminPage() {
     const handleDelete = async (id: number, title: string) => {
         if (!confirm(`「${title}」を削除しますか？`)) return;
         try {
-            await fetch(`/api/books/${id}`, { method: 'DELETE' });
+            await fetch(`/bookshelf/api/books/${id}`, { method: 'DELETE' });
             fetchBooks();
         } catch (error) {
             console.error('Failed to delete:', error);

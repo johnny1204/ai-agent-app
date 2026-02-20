@@ -24,7 +24,7 @@ export default function NewBookPage() {
 
         setSaving(true);
         try {
-            const res = await fetch('/api/books', {
+            const res = await fetch('/bookshelf/api/books', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
