@@ -2,19 +2,24 @@
 var worker_default = {
   async fetch(request, env) {
     const url = new URL(request.url);
-    const path = url.pathname;
+    let apiPath = url.pathname;
+    if (apiPath.startsWith("/bookshelf/")) {
+      apiPath = apiPath.replace("/bookshelf", "");
+    } else if (apiPath === "/bookshelf") {
+      apiPath = "/";
+    }
     if (requiresAuth(request)) {
       const authResponse = checkAuth(request, env);
       if (authResponse) return authResponse;
     }
-    if (path === "/api/books" || path === "/api/books/") {
+    if (apiPath === "/api/books" || apiPath === "/api/books/") {
       return handleBooks(request, env.DB);
     }
-    const bookIdMatch = path.match(/^\/api\/books\/(\d+)$/);
+    const bookIdMatch = apiPath.match(/^\/api\/books\/(\d+)$/);
     if (bookIdMatch) {
       return handleBookById(request, env.DB, Number(bookIdMatch[1]));
     }
-    if (path === "/api/memos" || path === "/api/memos/") {
+    if (apiPath === "/api/memos" || apiPath === "/api/memos/") {
       return handleMemos(request, env.DB);
     }
     return env.ASSETS.fetch(request);

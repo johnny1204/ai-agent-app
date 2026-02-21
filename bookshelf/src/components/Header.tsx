@@ -10,6 +10,12 @@ export function Header() {
                         Reading Memo Bookshelf
                     </h1>
                 </Link>
+                <nav>
+                    {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+                    <a href="/" className="text-sm font-medium hover:text-stone-600 transition-colors text-stone-500 dark:text-stone-400 dark:hover:text-stone-300">
+                        ← TOPに戻る
+                    </a>
+                </nav>
             </div>
         </header>
     );

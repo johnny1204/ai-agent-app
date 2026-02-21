@@ -43,8 +43,8 @@ export default {
         }
 
         // --- Static assets ---
-        // Pass the ORIGINAL request to assets (do not modify URL)
-        // Cloudflare Pages expects /bookshelf/... to map to app/bookshelf/...
+        // Cloudflare Pages natively maps /bookshelf to /bookshelf/index.html
+        // and /bookshelf/admin to /bookshelf/admin.html automatically.
         return env.ASSETS.fetch(request);
     },
 } satisfies ExportedHandler<Env>;
