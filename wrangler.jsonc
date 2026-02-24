@@ -10,6 +10,11 @@
             "binding": "DB",
             "database_name": "reading-bookshelf",
             "database_id": "225db611-6c2e-48a3-bc30-bb64cc75604e"
+        },
+        {
+            "binding": "study_assistant_db",
+            "database_name": "study-assistant-db",
+            "database_id": "a4e9aad2-3e1c-4045-bbac-73518a499d1f"
         }
     ]
 }

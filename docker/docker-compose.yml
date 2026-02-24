@@ -5,3 +5,12 @@ services:
       - "8080:80"
     volumes:
       - ../app:/usr/share/nginx/html
+  
+  study-assistant:
+    image: node:20-bookworm
+    working_dir: /app/study-assistant
+    ports:
+      - "3000:3000"
+    volumes:
+      - ../:/app
+    command: npm run dev

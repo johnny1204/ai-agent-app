@@ -2,9 +2,11 @@
     "name": "ai-agent-app",
     "private": true,
     "scripts": {
-        "build": "(cd bookshelf && npm install && npm run build) && npm run build:worker",
+        "build": "npm run clean && (cd bookshelf && npm install && npm run build) && (cd study-assistant && npm install && npm run build) && npm run build:worker",
+        "clean": "rm -rf app/bookshelf app/study-assistant bookshelf/.next study-assistant/.next bookshelf/out study-assistant/out",
         "build:worker": "esbuild src/worker.ts --bundle --outfile=app/_worker.js --format=esm --platform=browser --external:cloudflare:workers",
-        "build:bookshelf": "cd bookshelf && npm install && npm run build"
+        "build:bookshelf": "rm -rf app/bookshelf && cd bookshelf && npm install && npm run build",
+        "build:assistant": "rm -rf app/study-assistant && cd study-assistant && npm install && npm run build"
     },
     "devDependencies": {
         "esbuild": "^0.27.3"
