@@ -56,7 +56,10 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
                     options: finalOptions,
                     correctAnswer: finalCorrectAnswer,
                     explanation: row.explanation,
-                    category: row.category
+                    category: row.category,
+                    examYear: row.exam_year,
+                    examSeason: row.exam_season,
+                    questionNumber: row.question_number
                 };
             });
 

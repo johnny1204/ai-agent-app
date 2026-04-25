@@ -6,7 +6,10 @@
         "clean": "rm -rf app/bookshelf app/study-assistant bookshelf/.next study-assistant/.next bookshelf/out study-assistant/out",
         "build:worker": "esbuild src/worker.ts --bundle --outfile=app/_worker.js --format=esm --platform=browser --external:cloudflare:workers",
         "build:bookshelf": "rm -rf app/bookshelf && cd bookshelf && npm install && npm run build",
-        "build:assistant": "rm -rf app/study-assistant && cd study-assistant && npm install && npm run build"
+        "build:assistant": "rm -rf app/study-assistant && cd study-assistant && npm install && npm run build",
+        "dev": "wrangler pages dev ./app --d1 DB=225db611-6c2e-48a3-bc30-bb64cc75604e --d1 study_assistant_db=a4e9aad2-3e1c-4045-bbac-73518a499d1f",
+        "dev:assistant": "cd study-assistant && npm run pages:dev",
+        "import:2025h": "cd study-assistant && node scripts/import-pdf-questions.mjs 2025r07h_ap_am --force"
     },
     "devDependencies": {
         "esbuild": "^0.27.3"

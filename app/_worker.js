@@ -7,6 +7,10 @@ var worker_default = {
       apiPath = apiPath.replace("/bookshelf", "");
     } else if (apiPath === "/bookshelf") {
       apiPath = "/";
+    } else if (apiPath.startsWith("/study-assistant/")) {
+      apiPath = apiPath.replace("/study-assistant", "");
+    } else if (apiPath === "/study-assistant") {
+      apiPath = "/";
     }
     if (requiresAuth(request)) {
       const authResponse = checkAuth(request, env);
@@ -21,6 +25,12 @@ var worker_default = {
     }
     if (apiPath === "/api/memos" || apiPath === "/api/memos/") {
       return handleMemos(request, env.DB);
+    }
+    if (apiPath === "/api/questions/public" || apiPath === "/api/questions/public/") {
+      return handlePublicQuestions(request, env);
+    }
+    if (apiPath === "/api/questions" || apiPath === "/api/questions/") {
+      if (request.method === "POST") return handleNextQuestion(request, env);
     }
     return env.ASSETS.fetch(request);
   }
@@ -262,6 +272,117 @@ async function handleDeleteMemo(request, db) {
     console.error("DELETE /api/memos error:", error);
     return Response.json({ error: "\u30E1\u30E2\u306E\u524A\u9664\u306B\u5931\u6557\u3057\u307E\u3057\u305F" }, { status: 500 });
   }
+}
+async function handlePublicQuestions(request, env) {
+  try {
+    const db = env.study_assistant_db;
+    const cacheTtlStr = env.PUBLIC_CACHE_TTL || "86400";
+    const limitCountStr = env.PUBLIC_QUESTIONS_LIMIT || "5";
+    const cacheTtl = parseInt(cacheTtlStr, 10);
+    const limitCount = parseInt(limitCountStr, 10) || 5;
+    const { results } = await db.prepare("SELECT * FROM questions LIMIT ?").bind(limitCount).all();
+    if (!results || results.length === 0) return Response.json([]);
+    const formattedQuestions = results.map((row) => formatQuestion(row, true));
+    return new Response(JSON.stringify(formattedQuestions), {
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": `public, s-maxage=${cacheTtl}, stale-while-revalidate=${Math.floor(cacheTtl / 2)}`
+      }
+    });
+  } catch (error) {
+    console.error("Error fetching public questions:", error);
+    return Response.json({ error: "Failed to fetch questions" }, { status: 500 });
+  }
+}
+async function handleNextQuestion(request, env) {
+  try {
+    const db = env.study_assistant_db;
+    const body = await request.json();
+    const topic = body?.topic;
+    const exclude = body?.exclude || [];
+    let query = "SELECT * FROM questions WHERE 1=1";
+    const params = [];
+    if (topic) {
+      query += " AND category = ?";
+      params.push(topic);
+    }
+    if (exclude.length > 0) {
+      query += " AND question NOT IN (" + exclude.map(() => "?").join(",") + ")";
+      params.push(...exclude);
+    }
+    query += " ORDER BY RANDOM() LIMIT 1";
+    let { results } = await db.prepare(query).bind(...params).all();
+    if ((!results || results.length === 0) && topic) {
+      let fallbackQuery = "SELECT * FROM questions WHERE 1=1";
+      const fallbackParams = [];
+      if (exclude.length > 0) {
+        fallbackQuery += " AND question NOT IN (" + exclude.map(() => "?").join(",") + ")";
+        fallbackParams.push(...exclude);
+      }
+      fallbackQuery += " ORDER BY RANDOM() LIMIT 1";
+      const fallbackRes = await db.prepare(fallbackQuery).bind(...fallbackParams).all();
+      results = fallbackRes.results;
+    }
+    if (results && results.length > 0) {
+      return Response.json(formatQuestion(results[0], false));
+    }
+    return Response.json({
+      question: `\u73FE\u5728\u300C${topic || "\u6307\u5B9A\u306A\u3057"}\u300D\u5206\u91CE\u306E\u904E\u53BB\u554F\u304C\u767B\u9332\u3055\u308C\u3066\u3044\u307E\u305B\u3093\u3002`,
+      options: ["-", "-", "-", "-"],
+      correctAnswer: 0,
+      explanation: "\u554F\u984C\u306E\u767B\u9332\u3092\u78BA\u8A8D\u3057\u3066\u304F\u3060\u3055\u3044\u3002",
+      category: topic || "Unknown"
+    });
+  } catch (error) {
+    console.error("Error fetching question:", error);
+    return Response.json({ error: "Failed to fetch question" }, { status: 500 });
+  }
+}
+function formatQuestion(row, isPublic) {
+  let parsedOptions = ["-", "-", "-", "-"];
+  try {
+    const cleanedOptions = row.options.replace(/,\s*\]$/, "]").replace(/\][^\]]*$/, "]");
+    parsedOptions = JSON.parse(cleanedOptions);
+  } catch (e) {
+    const match = row.options.match(/\[(.*)\]/);
+    if (match && match[1]) {
+      parsedOptions = match[1].split(",").map((s) => s.trim().replace(/^['"]|['"]$/g, "")).filter(Boolean);
+      if (parsedOptions.length !== 4) parsedOptions = ["[\u30D1\u30FC\u30B9\u5931\u6557]", "[\u30D1\u30FC\u30B9\u5931\u6557]", "[\u30D1\u30FC\u30B9\u5931\u6557]", "[\u30D1\u30FC\u30B9\u5931\u6557]"];
+    }
+  }
+  let finalOptions = parsedOptions;
+  let finalCorrectAnswer = row.correctAnswer;
+  if (parsedOptions.length === 4 && parsedOptions[0] !== "[\u30D1\u30FC\u30B9\u5931\u6557]") {
+    const optionsWithCorrectness = parsedOptions.map((text, idx) => ({
+      text,
+      isCorrect: idx === row.correctAnswer
+    }));
+    if (isPublic) {
+      let seed = row.question.length;
+      for (let i = optionsWithCorrectness.length - 1; i > 0; i--) {
+        const j = seed % (i + 1);
+        [optionsWithCorrectness[i], optionsWithCorrectness[j]] = [optionsWithCorrectness[j], optionsWithCorrectness[i]];
+        seed = (seed * 9301 + 49297) % 233280;
+      }
+    } else {
+      for (let i = optionsWithCorrectness.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [optionsWithCorrectness[i], optionsWithCorrectness[j]] = [optionsWithCorrectness[j], optionsWithCorrectness[i]];
+      }
+    }
+    finalOptions = optionsWithCorrectness.map((o) => o.text);
+    finalCorrectAnswer = optionsWithCorrectness.findIndex((o) => o.isCorrect);
+  }
+  return {
+    question: row.question,
+    options: finalOptions,
+    correctAnswer: finalCorrectAnswer,
+    explanation: row.explanation,
+    category: row.category,
+    exam_year: row.exam_year,
+    exam_season: row.exam_season,
+    question_number: row.question_number
+  };
 }
 export {
   worker_default as default

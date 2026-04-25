@@ -8,17 +8,20 @@
     "start": "next start",
     "lint": "eslint",
     "pages:build": "npx @cloudflare/next-on-pages",
-    "pages:dev": "npx wrangler pages dev .vercel/output/static --compatibility-date=2024-09-23"
+    "pages:dev": "npx wrangler pages dev .vercel/output/static --compatibility-date=2024-09-23 --d1 study_assistant_db=study-assistant-db"
   },
   "dependencies": {
     "@google/genai": "^1.42.0",
     "dotenv": "^17.3.1",
     "lucide-react": "^0.475.0",
+    "mermaid": "^11.12.3",
     "next": "15.5.2",
     "pdfreader": "^3.0.8",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-markdown": "^10.1.0",
     "recharts": "^2.15.1",
+    "remark-gfm": "^4.0.1",
     "zod": "^4.3.6"
   },
   "devDependencies": {

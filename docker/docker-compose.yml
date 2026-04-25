@@ -1,3 +1,11 @@
+# docker-compose.yml の使い方:
+#
+#   # 全サービス起動
+#   docker compose -f docker/docker-compose.yml up
+#
+#   # study-assistant 開発サーバー起動
+#   docker compose -f docker/docker-compose.yml up study-assistant
+
 services:
   web:
     image: nginx:alpine
@@ -5,7 +13,7 @@ services:
       - "8080:80"
     volumes:
       - ../app:/usr/share/nginx/html
-  
+
   study-assistant:
     image: node:20-bookworm
     working_dir: /app/study-assistant

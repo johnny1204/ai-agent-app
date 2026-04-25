@@ -1,8 +1,60 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip } from "recharts";
 import { Brain, FileQuestion, GraduationCap, ChevronRight, Activity, Sparkles, RefreshCcw, Home } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import mermaid from "mermaid";
+
+// Specialized component to render Mermaid diagrams
+const Mermaid = ({ chart }: { chart: string }) => {
+    const ref = useRef<HTMLDivElement>(null);
+    const [svg, setSvg] = useState<string>("");
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: "dark",
+            securityLevel: "loose",
+            fontFamily: "Inter, var(--font-sans)",
+        });
+
+        const renderChart = async () => {
+            if (!chart) return;
+            try {
+                // Generate a unique ID for each mermaid diagram
+                const id = `mermaid-${Math.random().toString(36).substring(2, 9)}`;
+                const { svg } = await mermaid.render(id, chart);
+                setSvg(svg);
+                setError(null);
+            } catch (err) {
+                console.error("Mermaid Render Error:", err);
+                setError("図のレンダリングに失敗しました。");
+            }
+        };
+
+        renderChart();
+    }, [chart]);
+
+    if (error) {
+        return <div className="p-4 bg-rose-500/10 border border-rose-500/20 rounded-xl text-rose-400 text-sm font-mono whitespace-pre-wrap">{chart}</div>;
+    }
+
+    if (!svg) {
+        return <div className="w-full h-32 animate-pulse bg-slate-800/50 rounded-xl" />;
+    }
+
+    return (
+        <div
+            className="flex justify-center my-6 p-4 bg-white/[0.02] rounded-2xl border border-white/5 overflow-x-auto"
+            dangerouslySetInnerHTML={{ __html: svg }}
+        />
+    );
+};
+
+const stripDiagramExpl = (text: string) => text.replace(/\[図解説:.*?\]/g, "");
 
 type Question = {
     question: string;
@@ -10,6 +62,9 @@ type Question = {
     correctAnswer: number;
     explanation: string;
     category: string;
+    exam_year?: number;
+    exam_season?: string;
+    question_number?: number;
 };
 
 type Result = {
@@ -359,16 +414,68 @@ export default function QuizApp({ mode }: QuizAppProps) {
 
                             {question && !loading && (
                                 <div className="flex flex-col h-full animate-in slide-in-from-right-8 fade-in duration-500">
-                                    <div className="flex justify-between items-center mb-8">
+                                    <div className="flex flex-wrap gap-2 mb-8">
                                         <span className="px-3.5 py-1.5 bg-indigo-500/10 text-indigo-300 text-xs font-bold tracking-wider rounded-lg border border-indigo-500/20 flex items-center gap-2">
                                             <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
-                                            FullStack: {question.category}
+                                            {question.category}
                                         </span>
+                                        {(question.exam_year || question.exam_season) && (
+                                            <span className="px-3.5 py-1.5 bg-sky-500/10 text-sky-300 text-xs font-bold tracking-wider rounded-lg border border-sky-500/20 flex items-center gap-2">
+                                                {question.exam_year}年 {question.exam_season}
+                                            </span>
+                                        )}
+                                        {question.question_number && (
+                                            <span className="px-3.5 py-1.5 bg-emerald-500/10 text-emerald-300 text-xs font-bold tracking-wider rounded-lg border border-emerald-500/20 flex items-center gap-2">
+                                                問 {question.question_number}
+                                            </span>
+                                        )}
                                     </div>
 
-                                    <h2 className="text-xl sm:text-2xl font-semibold text-slate-100 mb-10 leading-relaxed whitespace-pre-line">
-                                        {question.question}
-                                    </h2>
+                                    <div className="prose prose-invert max-w-none text-xl sm:text-2xl font-semibold text-slate-100 mb-10 leading-relaxed overflow-x-auto">
+                                        <ReactMarkdown
+                                            remarkPlugins={[remarkGfm]}
+                                            components={{
+                                                code({ className, children }) {
+                                                    const match = /language-(\w+)/.exec(className || "");
+                                                    const isMermaid = match && match[1] === "mermaid";
+                                                    const content = String(children).replace(/\n$/, "");
+
+                                                    if (isMermaid) {
+                                                        return <Mermaid chart={content} />;
+                                                    }
+                                                    return (
+                                                        <code className={`${className} bg-slate-800 px-1.5 py-0.5 rounded text-indigo-300 font-mono text-base`}>
+                                                            {children}
+                                                        </code>
+                                                    );
+                                                },
+                                                table({ children }) {
+                                                    return (
+                                                        <div className="overflow-x-auto my-6 bg-white/[0.02] rounded-2xl border border-white/5">
+                                                            <table className="min-w-full divide-y divide-white/5 text-sm sm:text-base font-normal">
+                                                                {children}
+                                                            </table>
+                                                        </div>
+                                                    );
+                                                },
+                                                thead({ children }) {
+                                                    return <thead className="bg-white/5">{children}</thead>;
+                                                },
+                                                th({ children }) {
+                                                    return <th className="px-6 py-4 text-left font-bold text-slate-300 uppercase tracking-wider">{children}</th>;
+                                                },
+                                                td({ children }) {
+                                                    return <td className="px-6 py-4 whitespace-nowrap text-slate-400 border-t border-white/5">{children}</td>;
+                                                },
+                                                p({ children }) {
+                                                    // Remove margins for paragraphs inside options/prose to keep it tight
+                                                    return <p className="m-0 mb-1 last:mb-0">{children}</p>;
+                                                }
+                                            }}
+                                        >
+                                            {stripDiagramExpl(question.question)}
+                                        </ReactMarkdown>
+                                    </div>
 
                                     {question.category !== "終了" && (
                                         <div className="space-y-4 mb-8">
@@ -405,7 +512,25 @@ export default function QuizApp({ mode }: QuizAppProps) {
                                                                 }`}>
                                                                 {String.fromCharCode(65 + idx)}
                                                             </span>
-                                                            <span className="pt-1 whitespace-pre-line">{opt}</span>
+                                                            <span className="pt-1 flex-grow overflow-x-auto text-lg">
+                                                                <ReactMarkdown
+                                                                    remarkPlugins={[remarkGfm]}
+                                                                    components={{
+                                                                        code({ className, children }) {
+                                                                            const match = /language-(\w+)/.exec(className || "");
+                                                                            const isMermaid = match && match[1] === "mermaid";
+                                                                            const content = String(children).replace(/\n$/, "");
+                                                                            if (isMermaid) return <Mermaid chart={content} />;
+                                                                            return <code className={className}>{children}</code>;
+                                                                        },
+                                                                        p({ children }) {
+                                                                            return <p className="m-0 inline">{children}</p>;
+                                                                        }
+                                                                    }}
+                                                                >
+                                                                    {stripDiagramExpl(opt)}
+                                                                </ReactMarkdown>
+                                                            </span>
                                                         </div>
 
                                                         {showExplanation && isCorrect && !isFallback && selectedOption !== null && (
@@ -432,8 +557,21 @@ export default function QuizApp({ mode }: QuizAppProps) {
                                                 </h4>
                                             </div>
 
-                                            <div className="text-slate-300 text-sm leading-loose whitespace-pre-line">
-                                                <p>{question.explanation}</p>
+                                            <div className="text-slate-300 text-sm leading-loose prose prose-invert prose-sm max-w-none">
+                                                <ReactMarkdown
+                                                    remarkPlugins={[remarkGfm]}
+                                                    components={{
+                                                        code({ className, children }) {
+                                                            const match = /language-(\w+)/.exec(className || "");
+                                                            const isMermaid = match && match[1] === "mermaid";
+                                                            const content = String(children).replace(/\n$/, "");
+                                                            if (isMermaid) return <Mermaid chart={content} />;
+                                                            return <code className={className}>{children}</code>;
+                                                        }
+                                                    }}
+                                                >
+                                                    {stripDiagramExpl(question.explanation)}
+                                                </ReactMarkdown>
                                             </div>
 
                                             <div className="flex justify-end mt-8 pt-6 border-t border-slate-700/50">

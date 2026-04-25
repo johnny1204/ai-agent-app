@@ -4,6 +4,7 @@ import { execSync } from 'child_process';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { GoogleGenAI } from '@google/genai';
+import os from 'os';
 
 dotenv.config(); // Load variables from .env if present
 
@@ -15,6 +16,8 @@ if (!apiKey) {
     process.exit(1);
 }
 
+const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
 const ai = new GoogleGenAI({ apiKey });
 
 // Local LLM and Database configurations
@@ -22,6 +25,7 @@ const LOCAL_LLM_URL = process.env.LOCAL_LLM_URL || "http://localhost:11434/v1/ch
 const LOCAL_LLM_MODEL = process.env.LOCAL_LLM_MODEL || "llama3";
 const DB_NAME = process.env.DB_NAME || "study-assistant-db";
 const IS_REMOTE = process.argv.includes('--remote');
+const IS_FORCE = process.argv.includes('--force');
 const PDF_EXAMS_DIR = process.env.PDF_EXAMS_DIR || 'data/pdf_exams';
 
 async function uploadFile(filePath) {
@@ -40,8 +44,8 @@ async function extractQuestionsAndAnswers(examDirPath) {
     const TEMP_JSON_FILE = path.join(examDirPath, 'extracted_questions.json');
     const FINAL_JSON_FILE = path.join(examDirPath, 'final_questions.json');
 
-    // Auto-skip if already fully processed
-    if (fs.existsSync(FINAL_JSON_FILE)) {
+    // Auto-skip if already fully processed (unless forced)
+    if (fs.existsSync(FINAL_JSON_FILE) && !IS_FORCE) {
         console.log(`\n✅ Skipping folder ${path.basename(examDirPath)} (Already fully processed)`);
         return [];
     }
@@ -63,94 +67,110 @@ async function extractQuestionsAndAnswers(examDirPath) {
         const qsFile = await uploadFile(questionsPdfPath);
         const ansFile = await uploadFile(answersPdfPath);
 
-        console.log("\n[Step 1] Sending Multimodal prompt to Gemini 2.5 Flash to extract raw text and JSON structure...");
-        const prompt = `
-You are an expert IT instructor. I have uploaded two PDF files: exactly one file containing multiple-choice questions (often with 4 options like ア, イ, ウ, エ or similar), and another file containing the correct answers for those questions. The PDFs are Japanese IT exams (IPA).
+        try {
+            const CHUNK_SIZE = 10;
+            const TOTAL_QUESTIONS = 80; // Standard for IPA AM exams
 
-First, cross-reference and identify the mapping between the questions and their correct answers.
-Then, process each question and generate a cohesive JSON output.
+            for (let start = 1; start <= TOTAL_QUESTIONS; start += CHUNK_SIZE) {
+                const end = start + CHUNK_SIZE - 1;
+                console.log(`\n[Step 1] Extracting questions ${start} to ${end}...`);
 
-For EACH question found in the PDF, output a JSON object adhering STRICTLY to this format (in a JSON array):
+                const prompt = `
+You are an expert IT instructor. I have uploaded two PDF files: a question file and an answer file from a Japanese IT exam (IPA).
+Please focus ONLY on questions numbered ${start} to ${end}.
+
+For EACH question in this range, output a JSON object in a JSON array (ALL TEXT MUST BE IN JAPANESE - 日本語で出力してください):
 {
-  "question": "The text of the question (e.g. 1. ...). Combine any fragmented sentences.",
-  "options": [
-    "Option text for ア",
-    "Option text for イ",
-    "Option text for ウ",
-    "Option text for エ"
-  ],
-  "correctAnswer": 0, // integer index (0-3) of the correct option
-  "category": "Infer a broad IT category (e.g., 'セキュリティ', 'ネットワーク', 'データベース', 'プロジェクトマネジメント', '基礎理論', etc.) based on the content."
+  "question": "The text of the question. Combine fragmented sentences.
+    - TABLES: Convert to Markdown tables.
+    - DIAGRAMS/IMAGES: 
+        Produce a **Mermaid** code block (if logic/flow/tree) or an **SVG** code block (if custom layout). 
+    Example: '...次の図のとおりである：
+    \`\`\`mermaid
+    graph TD...
+    \`\`\`'",
+  "options": ["ア text", "イ text", "ウ text", "エ text"],
+  "correctAnswer": 0, // 0-3 index
+  "questionNumber": ${start}, // exact number from PDF
+  "category": "Choose from: ['セキュリティ', 'ネットワーク', 'データベース', '基礎理論', 'プロジェクトマネジメント']"
 }
 
-Do NOT generate explanations. Only extract the structure and identify the correct answer index.
-
-Output ONLY a raw, valid JSON array containing all the structured objects. Do not include markdown ticks, preamble, or postamble.
+Output ONLY a raw JSON array. No markdown outside the JSON, no "🎉", no extra text.
 `;
 
-        try {
-            let response;
-            try {
-                response = await ai.models.generateContent({
-                    model: "gemini-2.5-flash",
-                    contents: [
-                        {
-                            role: "user",
-                            parts: [
-                                { fileData: { fileUri: qsFile.uri, mimeType: qsFile.mimeType } },
-                                { fileData: { fileUri: ansFile.uri, mimeType: ansFile.mimeType } },
-                                { text: prompt }
-                            ]
+                let response;
+                let success = false;
+                let retryCount = 0;
+                const maxRetries = 3;
+
+                while (!success && retryCount < maxRetries) {
+                    try {
+                        response = await ai.models.generateContent({
+                            model: "gemini-2.5-flash",
+                            contents: [
+                                {
+                                    role: "user",
+                                    parts: [
+                                        { fileData: { fileUri: qsFile.uri, mimeType: qsFile.mimeType } },
+                                        { fileData: { fileUri: ansFile.uri, mimeType: ansFile.mimeType } },
+                                        { text: prompt }
+                                    ]
+                                }
+                            ],
+                            config: { temperature: 0.1 }
+                        });
+
+                        const outputText = response.text;
+                        const jsonMatch = outputText.match(/\[\s*\{[\s\S]*\}\s*\]/);
+
+                        if (jsonMatch) {
+                            const chunkData = JSON.parse(jsonMatch[0]);
+                            // Merge by questionNumber to avoid duplicates within same folder processing
+                            chunkData.forEach(newQ => {
+                                const existingIdx = extractedData.findIndex(exQ => exQ.questionNumber === newQ.questionNumber);
+                                if (existingIdx !== -1) {
+                                    extractedData[existingIdx] = { ...extractedData[existingIdx], ...newQ };
+                                } else {
+                                    extractedData.push(newQ);
+                                }
+                            });
+
+                            success = true;
+                            console.log(`✅ Successfully extracted ${chunkData.length} questions (${start}-${end}).`);
+                        } else {
+                            throw new Error("No JSON found in response");
                         }
-                    ],
-                    config: {
-                        temperature: 0.2
+                    } catch (err) {
+                        retryCount++;
+                        const isRateLimit = err.message.includes("429") || err.message.includes("RESOURCE_EXHAUSTED");
+                        const waitTime = isRateLimit ? retryCount * 20000 : 5000;
+                        console.warn(`⚠️ Error on chunk ${start}-${end}: ${err.message}. Retrying in ${waitTime / 1000}s... (${retryCount}/${maxRetries})`);
+                        await wait(waitTime);
                     }
-                });
-            } catch (fallbackError) {
-                console.warn(`⚠️ Gemini 2.5 API Error: ${fallbackError.message}`);
-                console.log(`🔄 Falling back to gemini-2.0-flash (higher free tier limits)...`);
-                response = await ai.models.generateContent({
-                    model: "gemini-2.0-flash",
-                    contents: [
-                        {
-                            role: "user",
-                            parts: [
-                                { fileData: { fileUri: qsFile.uri, mimeType: qsFile.mimeType } },
-                                { fileData: { fileUri: ansFile.uri, mimeType: ansFile.mimeType } },
-                                { text: prompt }
-                            ]
-                        }
-                    ],
-                    config: {
-                        temperature: 0.2
-                    }
-                });
+                }
+
+                if (!success) {
+                    console.error(`❌ Failed to extract chunk ${start}-${end} after ${maxRetries} attempts.`);
+                }
+
+                // Small delay between chunks to avoid rate limits
+                await wait(2000);
             }
 
-            const outputText = response.text;
-
-            // Attempt to extract the JSON array safely
-            const jsonMatch = outputText.match(/\[\s*\{[\s\S]*\}\s*\]/);
-            if (!jsonMatch) {
-                console.error("Failed to find JSON array from Gemini. Raw response:\n", outputText);
-                return [];
+            if (extractedData.length > 0) {
+                console.log(`\n💾 Saving total extraction results (${extractedData.length} items) to ${TEMP_JSON_FILE}...`);
+                fs.writeFileSync(TEMP_JSON_FILE, JSON.stringify(extractedData, null, 2));
             }
-
-            extractedData = JSON.parse(jsonMatch[0]);
-
-            console.log(`\n💾 Saving extraction results (${extractedData.length} items) to ${TEMP_JSON_FILE}...`);
-            fs.writeFileSync(TEMP_JSON_FILE, JSON.stringify(extractedData, null, 2));
 
         } catch (error) {
-            console.error("Gemini API Error:", error.message);
+            console.error("Critical Error during extraction:", error.message);
             return [];
         }
     }
 
     if (extractedData.length === 0) return [];
 
-    console.log(`\n[Step 2] Sending ${extractedData.length} questions to Local LLM at ${LOCAL_LLM_URL} (Model: ${LOCAL_LLM_MODEL}) for explanation generation...`);
+    console.log(`\n[Step 2] Generating ${extractedData.length} explanations...`);
 
     // Add explanations using the Local LLM
     for (let i = 0; i < extractedData.length; i++) {
@@ -179,30 +199,53 @@ Write a highly detailed, 300-character explanation of WHY this specific option i
 `;
 
         try {
-            const llmResponse = await fetch(LOCAL_LLM_URL, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    model: LOCAL_LLM_MODEL,
-                    messages: [{ role: "user", content: explanationPrompt }],
-                    temperature: 0.2
-                })
-            });
+            let explanationText = "";
 
-            if (!llmResponse.ok) {
-                console.error(`  -> Local LLM failed for Q${i + 1} with status ${llmResponse.status}. Skipping explanation.`);
-                q.explanation = "解説の生成に失敗しました。";
-                continue;
+            try {
+                const llmResponse = await fetch(LOCAL_LLM_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        model: LOCAL_LLM_MODEL,
+                        messages: [{ role: "user", content: explanationPrompt }],
+                        temperature: 0.2,
+                        stream: false // CRITICAL: Stop LM Studio from streaming
+                    })
+                });
+
+                if (llmResponse.ok) {
+                    const result = await llmResponse.json();
+                    if (result && result.choices && result.choices[0] && result.choices[0].message) {
+                        explanationText = result.choices[0].message.content.trim();
+                    } else {
+                        console.warn(`  -> Unexpected result structure from Q${i + 1}:`, JSON.stringify(result).substring(0, 100));
+                    }
+                } else {
+                    console.warn(`  -> Local LLM (LM Studio) returned status ${llmResponse.status}: ${llmResponse.statusText}`);
+                }
+            } catch (localErr) {
+                console.warn(`  -> Could not reach Local LLM at ${LOCAL_LLM_URL}: ${localErr.message}`);
+                // Strictly Local LLM. No fallback requested.
             }
 
-            const result = await llmResponse.json();
-            q.explanation = result.choices[0].message.content.trim();
+            q.explanation = explanationText || "解説の生成に失敗しました。";
+            if (explanationText) {
+                console.log(`  -> Q${i + 1}: Explanation generated via Local LLM.`);
+            }
 
-            // Save progress continuously
-            fs.writeFileSync(TEMP_JSON_FILE, JSON.stringify(extractedData, null, 2));
+            // Save progress continuously (non-blocking for EACCES errors)
+            try {
+                fs.writeFileSync(TEMP_JSON_FILE, JSON.stringify(extractedData, null, 2));
+            } catch (fsErr) {
+                if (fsErr.code === 'EACCES') {
+                    console.warn(`  -> Warning: Could not save progress to ${TEMP_JSON_FILE} due to permissions. Continuing anyway...`);
+                } else {
+                    throw fsErr;
+                }
+            }
 
         } catch (error) {
-            console.error(`  -> Network error generating explanation for Q${i + 1}: ${error.message}`);
+            console.error(`  -> Critical error generating explanation for Q${i + 1}: ${error.message}`);
             q.explanation = "解説の生成に失敗しました。";
         }
     }
@@ -226,16 +269,19 @@ function insertIntoD1(questionsArray) {
             // Escape single quotes for SQL
             const safeQuestion = q.question.replace(/'/g, "''");
             const safeOptions = JSON.stringify(q.options).replace(/'/g, "''");
-            // Handle missing explanation (shouldn't happen but just in case)
             const safeExplanation = (q.explanation || "").replace(/'/g, "''");
             const safeCategory = (q.category || "その他").replace(/'/g, "''");
-            return `('${safeQuestion}', '${safeOptions}', ${q.correctAnswer}, '${safeExplanation}', '${safeCategory}')`;
+            const examYear = q.examYear || 'NULL';
+            const examSeason = q.examSeason ? `'${q.examSeason.replace(/'/g, "''")}'` : 'NULL';
+            const questionNumber = q.questionNumber || 'NULL';
+
+            return `('${safeQuestion}', '${safeOptions}', ${q.correctAnswer}, '${safeExplanation}', '${safeCategory}', ${examYear}, ${examSeason}, ${questionNumber})`;
         }).join(",");
 
-        const query = `INSERT INTO questions (question, options, correctAnswer, explanation, category) VALUES ${values};`;
+        const query = `INSERT INTO questions (question, options, correctAnswer, explanation, category, exam_year, exam_season, question_number) VALUES ${values};`;
 
         // Save the query to a temporary string and pass it to wrangler to avoid bash escaping issues
-        const tempQueryFile = path.join(__dirname, 'temp_query.sql');
+        const tempQueryFile = path.join(os.tmpdir(), `temp_query_${Date.now()}.sql`);
         fs.writeFileSync(tempQueryFile, query);
 
         const wranglerCmd = `npx wrangler d1 execute ${DB_NAME} ${IS_REMOTE ? '--remote' : '--local'} --file "${tempQueryFile}"`;
@@ -246,8 +292,10 @@ function insertIntoD1(questionsArray) {
         fs.unlinkSync(tempQueryFile);
 
         console.log("✅ Bulk insert successful!");
+        return true;
     } catch (error) {
         console.error("❌ Failed to insert into D1:", error.message);
+        return false;
     }
 }
 
@@ -264,9 +312,22 @@ async function main() {
         process.exit(1);
     }
 
-    const folders = fs.readdirSync(targetDir, { withFileTypes: true })
+    let folders = fs.readdirSync(targetDir, { withFileTypes: true })
         .filter(dirent => dirent.isDirectory())
         .map(dirent => dirent.name);
+
+    // Filter by specific folder if provided as an argument (excluding --remote)
+    const specificFolderArg = process.argv.find(arg => !arg.startsWith('--') && arg.endsWith('_am'));
+    if (specificFolderArg) {
+        const specificFolder = path.basename(specificFolderArg);
+        if (folders.includes(specificFolder)) {
+            folders = [specificFolder];
+            console.log(`🎯 Filtering to specific folder: ${specificFolder}`);
+        } else {
+            console.error(`❌ ERROR: Folder ${specificFolder} not found in ${targetDir}`);
+            process.exit(1);
+        }
+    }
 
     if (folders.length === 0) {
         console.log("No exam folders found in data/pdf_exams/ to process.");
@@ -275,21 +336,48 @@ async function main() {
 
     console.log(`Found ${folders.length} exam folders to process.`);
 
+    let totalImported = 0;
+
     for (const folderName of folders) {
         const examDirPath = path.join(targetDir, folderName);
         console.log(`\n================================`);
         console.log(`🚀 Starting processing for: ${folderName}`);
         console.log(`================================`);
 
-        const extractedQuestions = await extractQuestionsAndAnswers(examDirPath);
+        let extractedQuestions = await extractQuestionsAndAnswers(examDirPath);
 
         if (extractedQuestions.length > 0) {
             console.log(`Successfully structured ${extractedQuestions.length} questions for ${folderName}.`);
-            insertIntoD1(extractedQuestions);
+
+            // Extract year and season from folder name (e.g., 2024r06a_ap_am)
+            // Format: YYYY(EraYear)(SeasonCode)_...
+            // a = spring (秋ではない, 春), h = fall (秋)
+            const yearMatch = folderName.match(/^(\d{4})/);
+            const seasonMatch = folderName.match(/([ah])_/);
+            const year = yearMatch ? parseInt(yearMatch[1]) : null;
+            let season = null;
+            if (seasonMatch) {
+                season = seasonMatch[1] === 'a' ? '春期' : '秋期';
+            }
+
+            extractedQuestions = extractedQuestions.map(q => ({
+                ...q,
+                examYear: year,
+                examSeason: season
+            }));
+
+            const success = insertIntoD1(extractedQuestions);
+            if (success) {
+                totalImported += extractedQuestions.length;
+            }
         }
     }
 
-    console.log("\n🎉 All 10-year batch import processing is complete!");
+    if (totalImported > 0) {
+        console.log(`\n🎉 Success! A total of ${totalImported} questions were processed and imported.`);
+    } else {
+        console.log("\n⚠️ No new questions were imported. Check the logs for errors.");
+    }
     process.exit(0);
 }
 
