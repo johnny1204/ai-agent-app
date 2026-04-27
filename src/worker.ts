@@ -53,6 +53,10 @@ export default {
             return handlePublicQuestions(request, env);
         }
 
+        if (apiPath === '/api/note-rss' || apiPath === '/api/note-rss/') {
+            return handleNoteRss(request);
+        }
+
         if (apiPath === '/api/questions' || apiPath === '/api/questions/') {
             if (request.method === 'POST') return handleNextQuestion(request, env);
         }
@@ -325,6 +329,52 @@ async function handleDeleteMemo(request: Request, db: D1Database): Promise<Respo
     } catch (error) {
         console.error('DELETE /api/memos error:', error);
         return Response.json({ error: 'メモの削除に失敗しました' }, { status: 500 });
+    }
+}
+
+// ============================================================
+// API: /api/note-rss
+// ============================================================
+
+async function handleNoteRss(request: Request): Promise<Response> {
+    const headers = {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Cache-Control': 'public, s-maxage=900, stale-while-revalidate=3600',
+    };
+
+    if (request.method === 'OPTIONS') {
+        return new Response(null, { status: 204, headers });
+    }
+    if (request.method !== 'GET') {
+        return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405, headers });
+    }
+
+    const target = 'https://note.com/katagaki_none/rss';
+
+    try {
+        const upstream = await fetch(target, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (compatible; ai-agent-app/1.0; +https://katagaki-none.com)',
+                'Accept': 'application/rss+xml, application/xml, text/xml;q=0.9, */*;q=0.8',
+            },
+            cf: { cacheTtl: 900, cacheEverything: true },
+        });
+
+        if (!upstream.ok) {
+            return new Response(JSON.stringify({ error: `upstream status ${upstream.status}` }), {
+                status: 502,
+                headers,
+            });
+        }
+
+        const contents = await upstream.text();
+        return new Response(JSON.stringify({ contents }), { status: 200, headers });
+    } catch (error) {
+        console.error('GET /api/note-rss error:', error);
+        return new Response(JSON.stringify({ error: 'failed to fetch note rss' }), { status: 502, headers });
     }
 }
 

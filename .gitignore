@@ -10,3 +10,5 @@ node_modules/
 # Next.js
 bookshelf/.next/
 bookshelf/out/
+
+.codex

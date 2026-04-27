@@ -29,6 +29,9 @@ var worker_default = {
     if (apiPath === "/api/questions/public" || apiPath === "/api/questions/public/") {
       return handlePublicQuestions(request, env);
     }
+    if (apiPath === "/api/note-rss" || apiPath === "/api/note-rss/") {
+      return handleNoteRss(request);
+    }
     if (apiPath === "/api/questions" || apiPath === "/api/questions/") {
       if (request.method === "POST") return handleNextQuestion(request, env);
     }
@@ -273,6 +276,43 @@ async function handleDeleteMemo(request, db) {
     return Response.json({ error: "\u30E1\u30E2\u306E\u524A\u9664\u306B\u5931\u6557\u3057\u307E\u3057\u305F" }, { status: 500 });
   }
 }
+async function handleNoteRss(request) {
+  const headers = {
+    "Content-Type": "application/json; charset=utf-8",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Cache-Control": "public, s-maxage=900, stale-while-revalidate=3600"
+  };
+  if (request.method === "OPTIONS") {
+    return new Response(null, { status: 204, headers });
+  }
+  if (request.method !== "GET") {
+    return new Response(JSON.stringify({ error: "Method not allowed" }), { status: 405, headers });
+  }
+  const target = "https://note.com/katagaki_none/rss";
+  try {
+    const upstream = await fetch(target, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (compatible; ai-agent-app/1.0; +https://katagaki-none.com)",
+        "Accept": "application/rss+xml, application/xml, text/xml;q=0.9, */*;q=0.8"
+      },
+      cf: { cacheTtl: 900, cacheEverything: true }
+    });
+    if (!upstream.ok) {
+      return new Response(JSON.stringify({ error: `upstream status ${upstream.status}` }), {
+        status: 502,
+        headers
+      });
+    }
+    const contents = await upstream.text();
+    return new Response(JSON.stringify({ contents }), { status: 200, headers });
+  } catch (error) {
+    console.error("GET /api/note-rss error:", error);
+    return new Response(JSON.stringify({ error: "failed to fetch note rss" }), { status: 502, headers });
+  }
+}
+
 async function handlePublicQuestions(request, env) {
   try {
     const db = env.study_assistant_db;
