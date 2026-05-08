@@ -60,6 +60,11 @@
             animation-delay: 4s;
         }
     </style>
+    <script>
+        if (window.location.pathname.endsWith('/index.html')) {
+            window.location.replace('./' + window.location.search + window.location.hash);
+        }
+    </script>
 </head>
 
 <body
@@ -95,7 +100,7 @@
                 </summary>
                 <div
                     class="absolute right-0 mt-3 w-64 rounded-2xl border border-slate-700/70 bg-slate-900/95 backdrop-blur-md shadow-2xl p-2 z-30">
-                    <a href="about/index.html"
+                    <a href="about/"
                         class="block px-4 py-3 rounded-xl text-sm text-slate-200 hover:bg-cyan-500/10 hover:text-cyan-300 transition-colors">
                         About
                     </a>
@@ -137,7 +142,7 @@
                 AI Agent Application Development Journey
             </p>
             <p class="mt-6 text-sm">
-                <a href="about/index.html" class="text-cyan-300 hover:text-cyan-200 transition-colors">About</a>
+                <a href="about/" class="text-cyan-300 hover:text-cyan-200 transition-colors">About</a>
             </p>
         </section>
 

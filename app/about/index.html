@@ -57,7 +57,34 @@
         .animation-delay-4000 {
             animation-delay: 4s;
         }
+
+        .tech-tooltip {
+            display: none;
+            position: absolute;
+            left: 0;
+            top: calc(100% + 8px);
+            z-index: 40;
+            min-width: 220px;
+            border-radius: 0.75rem;
+            background: rgba(2, 6, 23, 0.95);
+            border: 1px solid rgba(51, 65, 85, 0.8);
+            padding: 0.6rem 0.75rem;
+            font-size: 0.75rem;
+            line-height: 1.5;
+            color: rgb(203 213 225);
+            box-shadow: 0 10px 30px rgba(2, 6, 23, 0.5);
+            pointer-events: none;
+        }
+
+        .tech-item:hover .tech-tooltip {
+            display: block;
+        }
     </style>
+    <script>
+        if (window.location.pathname.endsWith('/index.html')) {
+            window.location.replace('./' + window.location.search + window.location.hash);
+        }
+    </script>
 </head>
 
 <body
@@ -77,7 +104,7 @@
     </div>
 
     <header class="w-full px-6 py-8 flex justify-between items-center max-w-6xl mx-auto">
-        <a href="../index.html" class="text-xl font-bold tracking-wider text-slate-100 uppercase">
+        <a href="../" class="text-xl font-bold tracking-wider text-slate-100 uppercase">
             肩書はまだない
         </a>
         <nav class="relative">
@@ -92,11 +119,11 @@
                 </summary>
                 <div
                     class="absolute right-0 mt-3 w-64 rounded-2xl border border-slate-700/70 bg-slate-900/95 backdrop-blur-md shadow-2xl p-2 z-30">
-                    <a href="../index.html"
+                    <a href="../"
                         class="block px-4 py-3 rounded-xl text-sm text-slate-200 hover:bg-cyan-500/10 hover:text-cyan-300 transition-colors">
                         Home
                     </a>
-                    <a href="index.html"
+                    <a href="./"
                         class="block px-4 py-3 rounded-xl text-sm text-slate-200 hover:bg-cyan-500/10 hover:text-cyan-300 transition-colors">
                         About
                     </a>
@@ -122,7 +149,159 @@
             </h1>
         </section>
 
-        <section>
+        <section class="space-y-8">
+            <div
+                class="rounded-3xl bg-slate-900/70 p-8 md:p-10 backdrop-blur-sm shadow-[0_20px_80px_rgba(15,23,42,0.35)] max-w-5xl mx-auto">
+                <div class="grid gap-4 md:grid-cols-2">
+                    <div class="rounded-2xl bg-slate-950/40 p-4">
+                        <p class="text-xs tracking-[0.16em] text-slate-400 uppercase">専門領域</p>
+                        <p class="mt-2 text-slate-100">Web開発</p>
+                    </div>
+                    <div class="rounded-2xl bg-slate-950/40 p-4">
+                        <p class="text-xs tracking-[0.16em] text-slate-400 uppercase">経験年数</p>
+                        <p class="mt-2 text-slate-100">Web開発経験 10年</p>
+                    </div>
+                    <div class="rounded-2xl bg-slate-950/40 p-4 md:col-span-2">
+                        <p class="text-xs tracking-[0.16em] text-slate-400 uppercase">担当範囲</p>
+                        <p class="mt-2 text-slate-100">設計 / 製造 / テスト</p>
+                    </div>
+                    <div class="rounded-2xl bg-slate-950/40 p-4 md:col-span-2">
+                        <p class="text-xs tracking-[0.16em] text-slate-400 uppercase">開発スタイル</p>
+                        <p class="mt-2 text-slate-100">まず動くものを早く出して改善</p>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                class="rounded-3xl bg-slate-900/70 p-8 md:p-10 backdrop-blur-sm shadow-[0_20px_80px_rgba(15,23,42,0.35)] max-w-5xl mx-auto">
+                <h2 class="text-2xl font-bold text-slate-50">技術スタック</h2>
+                <div class="mt-6 space-y-5">
+                    <div>
+                        <p class="text-xs tracking-[0.16em] text-cyan-300 uppercase">バックエンド</p>
+                        <div class="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                            <div class="tech-item relative flex items-center gap-3 rounded-xl bg-slate-950/45 px-3 py-2"><img src="https://cdn.simpleicons.org/php/777BB4" alt="PHP" class="w-5 h-5"><span class="text-sm text-slate-200">PHP</span><div class="tech-tooltip">経験年数: 10年<br>主なバージョン: 5.x / 7.x / 8.x</div></div>
+                            <div class="tech-item relative flex items-center gap-3 rounded-xl bg-slate-950/45 px-3 py-2"><img src="https://cdn.simpleicons.org/laravel/FF2D20" alt="Laravel" class="w-5 h-5"><span class="text-sm text-slate-200">Laravel</span><div class="tech-tooltip">主なバージョン: 7.x / 8.x / 9.x / 10.x / 11.x / 12.x</div></div>
+                            <div class="tech-item relative flex items-center gap-3 rounded-xl bg-slate-950/45 px-3 py-2"><img src="https://cdn.simpleicons.org/codeigniter/EF4223" alt="CodeIgniter" class="w-5 h-5"><span class="text-sm text-slate-200">CodeIgniter</span><div class="tech-tooltip">主なバージョン: 3</div></div>
+                            <div class="tech-item relative flex items-center gap-3 rounded-xl bg-slate-950/45 px-3 py-2"><img src="https://cdn.simpleicons.org/mysql/4479A1" alt="MySQL" class="w-5 h-5"><span class="text-sm text-slate-200">MySQL</span><div class="tech-tooltip">主なバージョン: 5.x / 8.x</div></div>
+                            <div class="flex items-center gap-3 rounded-xl bg-slate-950/45 px-3 py-2"><img src="https://cdn.simpleicons.org/mysql/4479A1" alt="Aurora MySQL" class="w-5 h-5"><span class="text-sm text-slate-200">Aurora MySQL</span></div>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-xs tracking-[0.16em] text-cyan-300 uppercase">フロントエンド</p>
+                        <div class="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                            <div class="tech-item relative flex items-center gap-3 rounded-xl bg-slate-950/45 px-3 py-2"><img src="https://cdn.simpleicons.org/javascript/F7DF1E" alt="JavaScript" class="w-5 h-5"><span class="text-sm text-slate-200">JavaScript</span><div class="tech-tooltip">経験年数: 10年<br>主なバージョン: ES5 / ES6+</div></div>
+                            <div class="tech-item relative flex items-center gap-3 rounded-xl bg-slate-950/45 px-3 py-2"><img src="https://cdn.simpleicons.org/typescript/3178C6" alt="TypeScript" class="w-5 h-5"><span class="text-sm text-slate-200">TypeScript</span><div class="tech-tooltip">経験年数: 3年<br>主なバージョン: 4.x / 5.x</div></div>
+                            <div class="tech-item relative flex items-center gap-3 rounded-xl bg-slate-950/45 px-3 py-2"><img src="https://cdn.simpleicons.org/react/61DAFB" alt="React" class="w-5 h-5"><span class="text-sm text-slate-200">React</span><div class="tech-tooltip">経験年数: 3年<br>主なバージョン: 17 / 18</div></div>
+                            <div class="flex items-center gap-3 rounded-xl bg-slate-950/45 px-3 py-2"><img src="https://cdn.simpleicons.org/nodedotjs/5FA04E" alt="Node.js" class="w-5 h-5"><span class="text-sm text-slate-200">Node.js</span></div>
+                            <div class="tech-item relative flex items-center gap-3 rounded-xl bg-slate-950/45 px-3 py-2"><img src="https://cdn.simpleicons.org/jquery/0769AD" alt="jQuery" class="w-5 h-5"><span class="text-sm text-slate-200">jQuery</span><div class="tech-tooltip">経験年数: 6年</div></div>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-xs tracking-[0.16em] text-cyan-300 uppercase">インフラ</p>
+                        <div class="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                            <div class="tech-item relative flex items-center gap-3 rounded-xl bg-slate-950/45 px-3 py-2"><img src="../assets/aws-icons/ec2.svg" alt="AWS" class="w-5 h-5"><span class="text-sm text-slate-200">AWS</span><div class="tech-tooltip">経験年数: 3年</div></div>
+                            <div class="flex items-center gap-3 rounded-xl bg-slate-950/45 px-3 py-2"><img src="https://cdn.simpleicons.org/docker/2496ED" alt="Docker" class="w-5 h-5"><span class="text-sm text-slate-200">Docker</span></div>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-xs tracking-[0.16em] text-cyan-300 uppercase">OS</p>
+                        <div class="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                            <div class="tech-item relative flex items-center gap-3 rounded-xl bg-slate-950/45 px-3 py-2"><img src="https://cdn.simpleicons.org/linux/FCC624" alt="Linux" class="w-5 h-5"><span class="text-sm text-slate-200">Linux</span><div class="tech-tooltip">経験年数: 10年</div></div>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-xs tracking-[0.16em] text-cyan-300 uppercase">Git</p>
+                        <div class="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                            <div class="tech-item relative flex items-center gap-3 rounded-xl bg-slate-950/45 px-3 py-2"><img src="https://cdn.simpleicons.org/git/F05032" alt="Git" class="w-5 h-5"><span class="text-sm text-slate-200">Git</span><div class="tech-tooltip">経験年数: 10年</div></div>
+                            <div class="flex items-center gap-3 rounded-xl bg-slate-950/45 px-3 py-2"><img src="https://cdn.simpleicons.org/github/FFFFFF" alt="GitHub" class="w-5 h-5"><span class="text-sm text-slate-200">GitHub</span></div>
+                            <div class="flex items-center gap-3 rounded-xl bg-slate-950/45 px-3 py-2"><img src="https://cdn.simpleicons.org/gitlab/FC6D26" alt="GitLab" class="w-5 h-5"><span class="text-sm text-slate-200">GitLab</span></div>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-xs tracking-[0.16em] text-cyan-300 uppercase">CI/CD</p>
+                        <div class="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                            <div class="flex items-center gap-3 rounded-xl bg-slate-950/45 px-3 py-2"><img src="https://cdn.simpleicons.org/githubactions/2088FF" alt="GitHub Actions" class="w-5 h-5"><span class="text-sm text-slate-200">GitHub Actions</span></div>
+                            <div class="flex items-center gap-3 rounded-xl bg-slate-950/45 px-3 py-2"><img src="https://cdn.simpleicons.org/gitlab/FC6D26" alt="GitLab CI" class="w-5 h-5"><span class="text-sm text-slate-200">GitLab CI</span></div>
+                            <div class="flex items-center gap-3 rounded-xl bg-slate-950/45 px-3 py-2"><img src="../assets/aws-icons/codedeploy.svg" alt="CodeDeploy" class="w-5 h-5"><span class="text-sm text-slate-200">CodeDeploy</span></div>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-xs tracking-[0.16em] text-cyan-300 uppercase">AI</p>
+                        <div class="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                            <div class="flex items-center gap-3 rounded-xl bg-slate-950/45 px-3 py-2"><img src="https://cdn.simpleicons.org/openaigym/FFFFFF" alt="ChatGPT" class="w-5 h-5"><span class="text-sm text-slate-200">ChatGPT</span></div>
+                            <div class="flex items-center gap-3 rounded-xl bg-slate-950/45 px-3 py-2"><img src="https://cdn.simpleicons.org/claude/FFFFFF" alt="Claude" class="w-5 h-5"><span class="text-sm text-slate-200">Claude</span></div>
+                            <div class="flex items-center gap-3 rounded-xl bg-slate-950/45 px-3 py-2"><img src="https://cdn.simpleicons.org/googlegemini/8E75B2" alt="Gemini" class="w-5 h-5"><span class="text-sm text-slate-200">Gemini</span></div>
+                            <div class="flex items-center gap-3 rounded-xl bg-slate-950/45 px-3 py-2"><img src="https://cdn.simpleicons.org/openaigym/FFFFFF" alt="Codex" class="w-5 h-5"><span class="text-sm text-slate-200">Codex</span></div>
+                            <div class="flex items-center gap-3 rounded-xl bg-slate-950/45 px-3 py-2"><img src="https://cdn.simpleicons.org/claude/FFFFFF" alt="Claude Code" class="w-5 h-5"><span class="text-sm text-slate-200">Claude Code</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-8">
+                    <p class="text-xs tracking-[0.16em] text-slate-400 uppercase">AWS詳細</p>
+                    <div class="mt-4 space-y-5">
+                        <div>
+                            <p class="text-xs tracking-[0.16em] text-cyan-300 uppercase">コンピュート</p>
+                            <div class="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                                <div class="flex items-center gap-3 rounded-xl bg-slate-950/45 px-3 py-2"><img src="../assets/aws-icons/ec2.svg" alt="EC2" class="w-6 h-6"><span class="text-sm text-slate-200">EC2</span></div>
+                                <div class="flex items-center gap-3 rounded-xl bg-slate-950/45 px-3 py-2"><img src="../assets/aws-icons/ecs.svg" alt="ECS" class="w-6 h-6"><span class="text-sm text-slate-200">ECS</span></div>
+                                <div class="flex items-center gap-3 rounded-xl bg-slate-950/45 px-3 py-2"><img src="../assets/aws-icons/lambda.svg" alt="Lambda" class="w-6 h-6"><span class="text-sm text-slate-200">Lambda</span></div>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-xs tracking-[0.16em] text-cyan-300 uppercase">ネットワーク</p>
+                            <div class="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                                <div class="flex items-center gap-3 rounded-xl bg-slate-950/45 px-3 py-2"><img src="../assets/aws-icons/vpc.svg" alt="VPC" class="w-6 h-6"><span class="text-sm text-slate-200">VPC</span></div>
+                                <div class="flex items-center gap-3 rounded-xl bg-slate-950/45 px-3 py-2"><img src="../assets/aws-icons/route53.svg" alt="Route 53" class="w-6 h-6"><span class="text-sm text-slate-200">Route 53</span></div>
+                                <div class="flex items-center gap-3 rounded-xl bg-slate-950/45 px-3 py-2"><img src="../assets/aws-icons/apigateway.svg" alt="API Gateway" class="w-6 h-6"><span class="text-sm text-slate-200">API Gateway</span></div>
+                                <div class="flex items-center gap-3 rounded-xl bg-slate-950/45 px-3 py-2"><img src="../assets/aws-icons/alb.svg" alt="ALB" class="w-6 h-6"><span class="text-sm text-slate-200">ALB</span></div>
+                                <div class="flex items-center gap-3 rounded-xl bg-slate-950/45 px-3 py-2"><img src="../assets/aws-icons/cloudfront.svg" alt="CloudFront" class="w-6 h-6"><span class="text-sm text-slate-200">CloudFront</span></div>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-xs tracking-[0.16em] text-cyan-300 uppercase">セキュリティ</p>
+                            <div class="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                                <div class="flex items-center gap-3 rounded-xl bg-slate-950/45 px-3 py-2"><img src="../assets/aws-icons/iam.svg" alt="IAM" class="w-6 h-6"><span class="text-sm text-slate-200">IAM</span></div>
+                                <div class="flex items-center gap-3 rounded-xl bg-slate-950/45 px-3 py-2"><img src="../assets/aws-icons/waf.svg" alt="WAF" class="w-6 h-6"><span class="text-sm text-slate-200">WAF</span></div>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-xs tracking-[0.16em] text-cyan-300 uppercase">データ</p>
+                            <div class="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                                <div class="flex items-center gap-3 rounded-xl bg-slate-950/45 px-3 py-2"><img src="../assets/aws-icons/s3.svg" alt="S3" class="w-6 h-6"><span class="text-sm text-slate-200">S3</span></div>
+                                <div class="flex items-center gap-3 rounded-xl bg-slate-950/45 px-3 py-2"><img src="../assets/aws-icons/rds.svg" alt="RDS" class="w-6 h-6"><span class="text-sm text-slate-200">RDS</span></div>
+                                <div class="flex items-center gap-3 rounded-xl bg-slate-950/45 px-3 py-2"><img src="../assets/aws-icons/rds.svg" alt="Aurora" class="w-6 h-6"><span class="text-sm text-slate-200">Aurora</span></div>
+                                <div class="flex items-center gap-3 rounded-xl bg-slate-950/45 px-3 py-2"><img src="../assets/aws-icons/athena.svg" alt="Athena" class="w-6 h-6"><span class="text-sm text-slate-200">Athena</span></div>
+                                <div class="flex items-center gap-3 rounded-xl bg-slate-950/45 px-3 py-2"><img src="../assets/aws-icons/cloudwatch.svg" alt="CloudWatch" class="w-6 h-6"><span class="text-sm text-slate-200">CloudWatch</span></div>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-xs tracking-[0.16em] text-cyan-300 uppercase">AI</p>
+                            <div class="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                                <div class="flex items-center gap-3 rounded-xl bg-slate-950/45 px-3 py-2"><img src="../assets/aws-icons/bedrock.svg" alt="Bedrock" class="w-6 h-6"><span class="text-sm text-slate-200">Bedrock</span></div>
+                                <div class="flex items-center gap-3 rounded-xl bg-slate-950/45 px-3 py-2"><img src="../assets/aws-icons/bedrock-agentcore.svg" alt="Bedrock AgentCore" class="w-6 h-6"><span class="text-sm text-slate-200">Bedrock AgentCore</span></div>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-xs tracking-[0.16em] text-cyan-300 uppercase">メッセージング</p>
+                            <div class="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                                <div class="flex items-center gap-3 rounded-xl bg-slate-950/45 px-3 py-2"><img src="../assets/aws-icons/sns.svg" alt="SNS" class="w-6 h-6"><span class="text-sm text-slate-200">SNS</span></div>
+                                <div class="flex items-center gap-3 rounded-xl bg-slate-950/45 px-3 py-2"><img src="../assets/aws-icons/ses.svg" alt="SES" class="w-6 h-6"><span class="text-sm text-slate-200">SES</span></div>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-xs tracking-[0.16em] text-cyan-300 uppercase">デリバリー</p>
+                            <div class="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                                <div class="flex items-center gap-3 rounded-xl bg-slate-950/45 px-3 py-2"><img src="../assets/aws-icons/codedeploy.svg" alt="CodeDeploy" class="w-6 h-6"><span class="text-sm text-slate-200">CodeDeploy</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-8">
+                    <p class="text-xs tracking-[0.16em] text-slate-400 uppercase">その他の経験技術</p>
+                    <p class="mt-3 text-slate-300 leading-relaxed">Vue.js / CircleCI / PostgreSQL / SQLServer / C# / Java / Go / Python / Ruby</p>
+                </div>
+            </div>
+
             <div
                 class="rounded-3xl bg-slate-900/70 p-8 md:p-10 backdrop-blur-sm shadow-[0_20px_80px_rgba(15,23,42,0.35)] max-w-5xl mx-auto">
                 <h2 class="text-2xl font-bold text-slate-50">資格</h2>
@@ -157,6 +336,25 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <div
+                class="rounded-3xl bg-slate-900/70 p-8 md:p-10 backdrop-blur-sm shadow-[0_20px_80px_rgba(15,23,42,0.35)] max-w-5xl mx-auto">
+                <h2 class="text-2xl font-bold text-slate-50">Contact</h2>
+                <div class="mt-6 flex flex-wrap items-center gap-3">
+                    <a href="https://x.com/katagaki_none" target="_blank" rel="noopener noreferrer"
+                        class="inline-flex items-center gap-2 rounded-full bg-slate-950/50 px-4 py-2 text-sm text-sky-300 hover:text-sky-200 transition-colors">
+                        X
+                    </a>
+                    <a href="https://github.com/johnny1204" target="_blank" rel="noopener noreferrer"
+                        class="inline-flex items-center gap-2 rounded-full bg-slate-950/50 px-4 py-2 text-sm text-slate-200 hover:text-white transition-colors">
+                        GitHub
+                    </a>
+                </div>
+                <div class="mt-6 rounded-2xl bg-slate-950/50 p-4 overflow-x-auto">
+                    <img src="https://ghchart.rshah.org/22c55e/johnny1204" alt="GitHub Contributions"
+                        class="min-w-[680px] w-full opacity-90">
                 </div>
             </div>
         </section>
